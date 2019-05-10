@@ -18,6 +18,7 @@ package software.amazon.awssdk.benchmark;
 import static software.amazon.awssdk.benchmark.utils.BenchmarkConstant.OBJECT_MAPPER;
 import static software.amazon.awssdk.benchmark.utils.BenchmarkUtils.compare;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.net.URL;
 import java.util.ArrayList;
@@ -66,6 +67,7 @@ class BenchmarkResultProcessor {
      * @return the benchmark Id that failed the regression
      */
     List<String> processBenchmarkResult(Collection<RunResult> results) {
+        List<SdkBenchmarkResult> currentData = new ArrayList<>();
         for (RunResult result : results) {
             String benchmarkId = getBenchmarkId(result.getParams());
 
@@ -77,10 +79,21 @@ class BenchmarkResultProcessor {
                 continue;
             }
 
+            currentData.add(sdkBenchmarkData);
+
             if (!validateBenchmarkResult(baselineResult, sdkBenchmarkData)) {
                 failedBenchmarkIds.add(benchmarkId);
             }
         }
+
+        log.info(() -> {
+            try {
+                return OBJECT_MAPPER.writeValueAsString(currentData);
+            } catch (JsonProcessingException e) {
+                log.error(() -> "Failed to serialize current result", e);
+            }
+            return null;
+        });
         return failedBenchmarkIds;
     }
 
