@@ -48,6 +48,7 @@ public class LimitingSubscriber<T> extends DelegatingSubscriber<T, T> {
         // If we've met the limit then we can cancel the subscription
         if (delivered.incrementAndGet() >= limit) {
             subscription.cancel();
+            subscriber.onComplete();
         }
     }
 }
