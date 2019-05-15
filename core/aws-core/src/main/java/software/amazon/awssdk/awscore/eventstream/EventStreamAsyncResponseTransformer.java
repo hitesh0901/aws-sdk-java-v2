@@ -205,6 +205,8 @@ public final class EventStreamAsyncResponseTransformer<ResponseT, EventT>
     public void onStream(SdkPublisher<ByteBuffer> publisher) {
         CompletableFuture<Subscription> dataSubscriptionFuture = new CompletableFuture<>();
         publisher.subscribe(new ByteSubscriber(dataSubscriptionFuture));
+
+
         dataSubscriptionFuture.thenAccept(dataSubscription -> {
             SdkPublisher<EventT> eventPublisher = new EventPublisher(dataSubscription);
             try {
@@ -433,9 +435,8 @@ public final class EventStreamAsyncResponseTransformer<ResponseT, EventT>
 
                         // Need to complete the futures, otherwise the downstream subscriber will never
                         // get notified
-                        transformFuture.complete(null);
-                        eventStreamResponseHandler.complete();
                         future.complete(null);
+                        transformFuture.complete(null);
                     }
                 });
             } else {

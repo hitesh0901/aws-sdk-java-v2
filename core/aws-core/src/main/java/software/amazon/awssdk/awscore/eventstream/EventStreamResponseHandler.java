@@ -102,7 +102,8 @@ public interface EventStreamResponseHandler<ResponseT, EventT> {
         SubBuilderT onError(Consumer<Throwable> consumer);
 
         /**
-         * Action to invoke when the event stream completes.
+         * Action to invoke when the event stream completes. This will only be invoked
+         * when all events are being received.
          *
          * @param runnable Action to run on the completion of the event stream.
          * @return This builder for method chaining.

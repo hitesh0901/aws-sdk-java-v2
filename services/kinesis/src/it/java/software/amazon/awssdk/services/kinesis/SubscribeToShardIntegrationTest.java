@@ -115,8 +115,8 @@ public class SubscribeToShardIntegrationTest extends AbstractTestCase {
     }
 
     @Test
-    public void cancelledSubscription_shouldNotThrowException() {
-        CountDownLatch countDownLatch = new CountDownLatch(2);
+    public void cancelledSubscription_doesNotCallTerminalMethods() {
+        AtomicBoolean terminalMethodsCalled = new AtomicBoolean(false);
         AtomicBoolean errorOccurred = new AtomicBoolean(false);
         List<SubscribeToShardEventStream> events = new ArrayList<>();
         asyncClient.subscribeToShard(r -> r.consumerARN(consumerArn)
@@ -148,7 +148,7 @@ public class SubscribeToShardIntegrationTest extends AbstractTestCase {
 
                                                  @Override
                                                  public void onComplete() {
-                                                     countDownLatch.countDown();
+                                                     terminalMethodsCalled.set(true);
                                                  }
                                              });
                                          }
@@ -160,11 +160,11 @@ public class SubscribeToShardIntegrationTest extends AbstractTestCase {
 
                                          @Override
                                          public void complete() {
-                                             countDownLatch.countDown();
+                                             terminalMethodsCalled.set(true);
                                          }
                                      }).join();
 
-        assertThat(countDownLatch.getCount()).isEqualTo(0);
+        assertThat(terminalMethodsCalled).isFalse();
         assertThat(errorOccurred).isFalse();
         assertThat(events.size()).isEqualTo(3);
 
