@@ -112,8 +112,8 @@ public final class DefaultConverterChain implements ItemAttributeValueConverter 
     }
 
     @Override
-    public ConversionCondition defaultConversionCondition() {
-        return CHAIN.defaultConversionCondition();
+    public ConversionCondition conversionCondition() {
+        return CHAIN.conversionCondition();
     }
 
     @Override

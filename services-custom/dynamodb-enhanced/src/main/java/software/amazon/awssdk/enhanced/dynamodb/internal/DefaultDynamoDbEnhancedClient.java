@@ -23,7 +23,6 @@ import software.amazon.awssdk.enhanced.dynamodb.Table;
 import software.amazon.awssdk.enhanced.dynamodb.converter.DefaultConverterChain;
 import software.amazon.awssdk.enhanced.dynamodb.converter.ItemAttributeValueConverter;
 import software.amazon.awssdk.enhanced.dynamodb.internal.converter.ItemAttributeValueConverterChain;
-import software.amazon.awssdk.enhanced.dynamodb.internal.model.DefaultTable;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.utils.Validate;
 

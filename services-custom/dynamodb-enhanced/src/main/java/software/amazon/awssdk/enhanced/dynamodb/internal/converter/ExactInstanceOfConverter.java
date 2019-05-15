@@ -39,7 +39,7 @@ public abstract class ExactInstanceOfConverter<T> implements ItemAttributeValueC
     }
 
     @Override
-    public ConversionCondition defaultConversionCondition() {
+    public ConversionCondition conversionCondition() {
         return ConversionCondition.isExactInstanceOf(type);
     }
 

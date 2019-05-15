@@ -41,4 +41,9 @@ public class ExactInstanceOfConversionCondition implements ConversionCondition {
     public Class<?> convertedClass() {
         return clazz;
     }
+
+    @Override
+    public boolean converts(Class<?> clazz) {
+        return this.clazz.equals(clazz);
+    }
 }

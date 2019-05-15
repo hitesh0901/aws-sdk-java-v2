@@ -161,6 +161,8 @@ public interface DynamoDbEnhancedClient extends ToCopyableBuilder<DynamoDbEnhanc
      */
     Table table(String tableName);
 
+    MappedTable mappedTable(String tableName);
+
     /**
      * Close this client, and release all resources it is using. If a client was configured with
      * {@link Builder#dynamoDbClient(DynamoDbClient)}, it <b>will not</b> be closed, and <b>must</b> be closed separately.

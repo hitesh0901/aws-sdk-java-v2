@@ -38,6 +38,7 @@ public class InstanceOfConversionCondition implements ConversionCondition {
         this.clazz = clazz;
     }
 
+    @Override
     public boolean converts(Class<?> clazz) {
         return this.clazz.isAssignableFrom(clazz);
     }

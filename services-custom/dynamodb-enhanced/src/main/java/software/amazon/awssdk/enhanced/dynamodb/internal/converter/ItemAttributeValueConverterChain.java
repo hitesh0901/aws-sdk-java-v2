@@ -45,6 +45,11 @@ public final class ItemAttributeValueConverterChain implements ItemAttributeValu
     private static final Logger log = Logger.loggerFor(ItemAttributeValueConverterChain.class);
 
     /**
+     * The condition under which this converter can be safely invoked.
+     */
+    private final ConversionCondition conversionCondition = new ChainConversionCondition();
+
+    /**
      * All converters in this chain that match the {@link ConversionCondition#isInstanceOf(Class)}
      */
     private final List<ItemAttributeValueConverter> instanceOfConverters = new ArrayList<>();
@@ -62,7 +67,7 @@ public final class ItemAttributeValueConverterChain implements ItemAttributeValu
 
     private ItemAttributeValueConverterChain(Builder builder) {
         for (ItemAttributeValueConverter converter : builder.converters) {
-            ConversionCondition condition = converter.defaultConversionCondition();
+            ConversionCondition condition = converter.conversionCondition();
 
             if (condition instanceof InstanceOfConversionCondition) {
                 this.instanceOfConverters.add(converter);
@@ -93,8 +98,8 @@ public final class ItemAttributeValueConverterChain implements ItemAttributeValu
     }
 
     @Override
-    public ConversionCondition defaultConversionCondition() {
-        return ConversionCondition.isInstanceOf(Object.class);
+    public ConversionCondition conversionCondition() {
+        return conversionCondition;
     }
 
     @Override
@@ -133,7 +138,6 @@ public final class ItemAttributeValueConverterChain implements ItemAttributeValu
             throw new IllegalStateException("Converter not found for " + type.getTypeName() + ".");
         }
 
-
         T result = converterInvoker.apply(converter);
 
         if (shouldCache(type)) {
@@ -152,7 +156,7 @@ public final class ItemAttributeValueConverterChain implements ItemAttributeValu
     private ItemAttributeValueConverter findInstanceOfConverter(Class<?> type) {
         for (ItemAttributeValueConverter converter : instanceOfConverters) {
             InstanceOfConversionCondition condition = (InstanceOfConversionCondition)
-                    converter.defaultConversionCondition();
+                    converter.conversionCondition();
 
             if (condition.converts(type)) {
                 return converter;
@@ -202,6 +206,17 @@ public final class ItemAttributeValueConverterChain implements ItemAttributeValu
             }
 
             return new ItemAttributeValueConverterChain(this);
+        }
+    }
+
+    private class ChainConversionCondition implements ConversionCondition {
+        @Override
+        public boolean converts(Class<?> clazz) {
+            if (converterCache.containsKey(clazz)) {
+                return true;
+            }
+
+
         }
     }
 }

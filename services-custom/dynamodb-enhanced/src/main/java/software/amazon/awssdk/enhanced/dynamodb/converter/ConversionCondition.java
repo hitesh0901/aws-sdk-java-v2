@@ -38,6 +38,8 @@ import software.amazon.awssdk.enhanced.dynamodb.internal.converter.InstanceOfCon
 @ThreadSafe
 @Immutable
 public interface ConversionCondition {
+    boolean converts(Class<?> clazz);
+
     /**
      * Create a condition that resolves to true when the Java type being converted exactly matches the provided type.
      *

@@ -39,7 +39,7 @@ public abstract class InstanceOfConverter<T> implements ItemAttributeValueConver
     }
 
     @Override
-    public final ConversionCondition defaultConversionCondition() {
+    public final ConversionCondition conversionCondition() {
         return ConversionCondition.isInstanceOf(type);
     }
 

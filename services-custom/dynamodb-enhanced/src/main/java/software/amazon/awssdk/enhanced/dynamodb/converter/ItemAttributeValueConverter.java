@@ -86,7 +86,7 @@ import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
  *
  * <p>
  * If multiple converters are configured at the same location (either a {@link RequestItem} or a {@link DynamoDbEnhancedClient}),
- * their relative precedence is determined by the converter's {@link #defaultConversionCondition()}.
+ * their relative precedence is determined by the converter's {@link #conversionCondition()}.
  *
  * <p>
  * Converters can have one of two conditions:
@@ -106,7 +106,7 @@ import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
  *
  * <p>
  * If multiple converters are configured at the same location (either a {@link RequestItem} or a {@link DynamoDbEnhancedClient})
- * AND they have the same {@link #defaultConversionCondition()}, their precedence is determined by the order in which they were
+ * AND they have the same {@link #conversionCondition()}, their precedence is determined by the order in which they were
  * configured.
  *
  * <p>
@@ -132,7 +132,7 @@ public interface ItemAttributeValueConverter {
      * <p>
      * This call should never fail with an {@link Exception}.
      */
-    ConversionCondition defaultConversionCondition();
+    ConversionCondition conversionCondition();
 
     /**
      * Convert the provided Java object into a {@link ItemAttributeValue} that can be persisted in DynamoDB.
