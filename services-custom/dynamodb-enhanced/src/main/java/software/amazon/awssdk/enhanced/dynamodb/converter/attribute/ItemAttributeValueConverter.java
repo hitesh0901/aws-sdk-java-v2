@@ -13,14 +13,15 @@
  * permissions and limitations under the License.
  */
 
-package software.amazon.awssdk.enhanced.dynamodb.converter;
+package software.amazon.awssdk.enhanced.dynamodb.converter.attribute;
 
 import java.time.Instant;
 import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
-import software.amazon.awssdk.enhanced.dynamodb.converter.bundled.InstantConverter;
-import software.amazon.awssdk.enhanced.dynamodb.converter.bundled.StringConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.bundled.DefaultConverterChain;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.bundled.InstantConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.bundled.StringConverter;
 import software.amazon.awssdk.enhanced.dynamodb.model.ConvertableItemAttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.GeneratedResponseItem;
 import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;

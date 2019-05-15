@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-package software.amazon.awssdk.enhanced.dynamodb.converter;
+package software.amazon.awssdk.enhanced.dynamodb.converter.attribute;
 
 import java.util.Optional;
 import software.amazon.awssdk.annotations.Immutable;

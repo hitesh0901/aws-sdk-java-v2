@@ -22,8 +22,8 @@ import software.amazon.awssdk.annotations.NotThreadSafe;
 import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
-import software.amazon.awssdk.enhanced.dynamodb.converter.DefaultConverterChain;
-import software.amazon.awssdk.enhanced.dynamodb.converter.ItemAttributeValueConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.bundled.DefaultConverterChain;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ItemAttributeValueConverter;
 
 /**
  * An interface applied to all objects that wish to expose their underlying {@link ItemAttributeValueConverter}s.

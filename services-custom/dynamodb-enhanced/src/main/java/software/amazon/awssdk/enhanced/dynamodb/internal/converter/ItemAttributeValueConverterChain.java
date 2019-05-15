@@ -18,13 +18,13 @@ package software.amazon.awssdk.enhanced.dynamodb.internal.converter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 import software.amazon.awssdk.annotations.SdkInternalApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
-import software.amazon.awssdk.enhanced.dynamodb.converter.ConversionCondition;
-import software.amazon.awssdk.enhanced.dynamodb.converter.ConversionContext;
-import software.amazon.awssdk.enhanced.dynamodb.converter.ItemAttributeValueConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionCondition;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionContext;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ItemAttributeValueConverter;
 import software.amazon.awssdk.enhanced.dynamodb.model.ConverterAware;
 import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
@@ -104,24 +104,30 @@ public final class ItemAttributeValueConverterChain implements ItemAttributeValu
 
     @Override
     public ItemAttributeValue toAttributeValue(Object input, ConversionContext context) {
-        return invokeConverter(input.getClass(), c -> c.toAttributeValue(input, context));
+        return findRequiredConverter(input.getClass()).toAttributeValue(input, context);
     }
 
     @Override
     public Object fromAttributeValue(ItemAttributeValue input, TypeToken<?> desiredType, ConversionContext context) {
-        return invokeConverter(desiredType.rawClass(), c -> c.fromAttributeValue(input, desiredType, context));
+        return findRequiredConverter(desiredType.rawClass()).fromAttributeValue(input, desiredType, context);
     }
 
     /**
-     * Find a converter that matches the provided type. Once the converter is found, invoke the provided invoker to generate
-     * a result type.
+     * Find a converter that matches the provided type. If one cannot be found, throw an exception.
      */
-    private <T> T invokeConverter(Class<?> type, Function<ItemAttributeValueConverter, T> converterInvoker) {
+    private ItemAttributeValueConverter findRequiredConverter(Class<?> type) {
+        return findConverter(type).orElseThrow(() -> new IllegalStateException("Converter not found for" + type.getTypeName()));
+    }
+
+    /**
+     * Find a converter that matches the provided type. If one cannot be found, return empty.
+     */
+    private Optional<ItemAttributeValueConverter> findConverter(Class<?> type) {
         log.debug(() -> "Loading converter for " + type.getTypeName() + ".");
 
         ItemAttributeValueConverter converter = converterCache.get(type);
         if (converter != null) {
-            return converterInvoker.apply(converter);
+            return Optional.of(converter);
         }
 
         log.debug(() -> "Converter not cached for " + type.getTypeName() + ". " +
@@ -134,18 +140,12 @@ public final class ItemAttributeValueConverterChain implements ItemAttributeValu
             converter = parent;
         }
 
-        if (converter == null) {
-            throw new IllegalStateException("Converter not found for " + type.getTypeName() + ".");
-        }
-
-        T result = converterInvoker.apply(converter);
-
-        if (shouldCache(type)) {
+        if (converter != null && shouldCache(type)) {
             // Only cache after successful conversion, to prevent leaking memory.
             this.converterCache.put(type, converter);
         }
 
-        return result;
+        return Optional.ofNullable(converter);
     }
 
     private boolean shouldCache(Class<?> type) {
@@ -212,11 +212,7 @@ public final class ItemAttributeValueConverterChain implements ItemAttributeValu
     private class ChainConversionCondition implements ConversionCondition {
         @Override
         public boolean converts(Class<?> clazz) {
-            if (converterCache.containsKey(clazz)) {
-                return true;
-            }
-
-
+            return findConverter(clazz).isPresent();
         }
     }
 }

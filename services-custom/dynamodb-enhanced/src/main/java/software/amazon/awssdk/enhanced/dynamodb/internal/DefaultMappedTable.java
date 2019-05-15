@@ -19,7 +19,6 @@ import software.amazon.awssdk.annotations.SdkInternalApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.enhanced.dynamodb.MappedTable;
 import software.amazon.awssdk.enhanced.dynamodb.Table;
-import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.utils.builder.Buildable;
 
 /**
@@ -45,7 +44,7 @@ public class DefaultMappedTable implements MappedTable {
 
     @Override
     public <T extends U, U> T getItem(Class<T> outputType, U key) {
-
+        return null;
     }
 
     @Override

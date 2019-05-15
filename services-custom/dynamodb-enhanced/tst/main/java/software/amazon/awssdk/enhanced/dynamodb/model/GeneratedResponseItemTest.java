@@ -23,8 +23,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import software.amazon.awssdk.enhanced.dynamodb.converter.ConversionCondition;
 import software.amazon.awssdk.enhanced.dynamodb.converter.ItemAttributeValueConverter;
-import software.amazon.awssdk.enhanced.dynamodb.converter.bundled.IntegerConverter;
-import software.amazon.awssdk.enhanced.dynamodb.converter.bundled.StringConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.item.bundled.IntegerConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.item.bundled.StringConverter;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
 public class GeneratedResponseItemTest {
