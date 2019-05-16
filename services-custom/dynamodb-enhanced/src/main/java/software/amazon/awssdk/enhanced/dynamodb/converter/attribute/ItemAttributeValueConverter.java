@@ -16,6 +16,7 @@
 package software.amazon.awssdk.enhanced.dynamodb.converter.attribute;
 
 import java.time.Instant;
+import java.util.function.Consumer;
 import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
@@ -151,6 +152,12 @@ public interface ItemAttributeValueConverter {
      */
     ItemAttributeValue toAttributeValue(Object input, ConversionContext context);
 
+    default ItemAttributeValue toAttributeValue(Object input, Consumer<ConversionContext.Builder> contextConsumer) {
+        ConversionContext.Builder context = ConversionContext.builder();
+        contextConsumer.accept(context);
+        return toAttributeValue(input, context.build());
+    }
+
     /**
      * Convert the provided {@link ItemAttributeValue} into a Java object that can be used by an application.
      *
@@ -171,4 +178,12 @@ public interface ItemAttributeValueConverter {
      * </ol>
      */
     Object fromAttributeValue(ItemAttributeValue input, TypeToken<?> desiredType, ConversionContext context);
+
+    default Object fromAttributeValue(ItemAttributeValue input,
+                                      TypeToken<?> desiredType,
+                                      Consumer<ConversionContext.Builder> contextConsumer) {
+        ConversionContext.Builder context = ConversionContext.builder();
+        contextConsumer.accept(context);
+        return fromAttributeValue(input, desiredType, context.build());
+    }
 }

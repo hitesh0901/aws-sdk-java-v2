@@ -19,9 +19,11 @@ import java.util.Collection;
 import software.amazon.awssdk.annotations.SdkInternalApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.MappedTable;
 import software.amazon.awssdk.enhanced.dynamodb.Table;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.bundled.DefaultConverterChain;
 import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ItemAttributeValueConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.bundled.DefaultConverterChain;
+import software.amazon.awssdk.enhanced.dynamodb.converter.item.ItemConverter;
 import software.amazon.awssdk.enhanced.dynamodb.internal.converter.ItemAttributeValueConverterChain;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.utils.Validate;
@@ -59,6 +61,14 @@ public class DefaultDynamoDbEnhancedClient implements DynamoDbEnhancedClient {
                            .dynamoDbClient(client)
                            .name(tableName)
                            .build();
+    }
+
+    @Override
+    public MappedTable mappedTable(String tableName, ItemConverter itemConverter) {
+        return DefaultMappedTable.builder()
+                                 .table(table(tableName))
+                                 .converter(itemConverter)
+                                 .build();
     }
 
     @Override

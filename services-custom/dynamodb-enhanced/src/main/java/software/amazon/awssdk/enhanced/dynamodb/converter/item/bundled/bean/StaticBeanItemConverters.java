@@ -13,28 +13,31 @@
  * permissions and limitations under the License.
  */
 
-package software.amazon.awssdk.enhanced.dynamodb.converter.item.bundled;
+package software.amazon.awssdk.enhanced.dynamodb.converter.item.bundled.bean;
 
+import static java.util.stream.Collectors.toMap;
+
+import java.util.List;
+import java.util.Map;
 import software.amazon.awssdk.enhanced.dynamodb.converter.item.ItemConverter;
-import software.amazon.awssdk.enhanced.dynamodb.converter.item.ItemSchema;
 import software.amazon.awssdk.enhanced.dynamodb.model.RequestItem;
 import software.amazon.awssdk.enhanced.dynamodb.model.ResponseItem;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 
-public class StaticItemConverter implements ItemConverter {
-    private final ItemSchema schema;
+public class StaticBeanItemConverters implements ItemConverter {
+    private final Map<Class<?>, StaticBeanItemConverter> schemas;
 
-    public StaticItemConverter(ItemSchema schema) {
-        this.schema = schema;
+    public StaticBeanItemConverters(List<? extends BeanItemSchema> schemas) {
+        this.schemas = schemas.stream().collect(toMap(s -> s.beanType().rawClass(), StaticBeanItemConverter::new));
     }
 
     @Override
     public RequestItem toRequestItem(Object request) {
-        return null;
+        return schemas.get(request.getClass()).toRequestItem(request);
     }
 
     @Override
     public <T> T fromResponseItem(TypeToken<T> targetType, ResponseItem responseItem) {
-        return null;
+        return schemas.get(targetType.rawClass()).fromResponseItem(targetType, responseItem);
     }
 }

@@ -23,6 +23,7 @@ import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.core.internal.http.loader.DefaultSdkHttpClientBuilder;
 import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ItemAttributeValueConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.item.ItemConverter;
 import software.amazon.awssdk.enhanced.dynamodb.internal.DefaultDynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.model.ConverterAware;
 import software.amazon.awssdk.regions.providers.DefaultAwsRegionProviderChain;
@@ -161,7 +162,7 @@ public interface DynamoDbEnhancedClient extends ToCopyableBuilder<DynamoDbEnhanc
      */
     Table table(String tableName);
 
-    MappedTable mappedTable(String tableName);
+    MappedTable mappedTable(String tableName, ItemConverter converter);
 
     /**
      * Close this client, and release all resources it is using. If a client was configured with
