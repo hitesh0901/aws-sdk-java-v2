@@ -64,10 +64,11 @@ public class DefaultDynamoDbEnhancedClient implements DynamoDbEnhancedClient {
     }
 
     @Override
-    public MappedTable mappedTable(String tableName, ItemConverter itemConverter) {
+    public MappedTable mappedTable(String tableName) {
         return DefaultMappedTable.builder()
-                                 .table(table(tableName))
-                                 .converter(itemConverter)
+                                 .converter(converter)
+                                 .dynamoDbClient(client)
+                                 .name(tableName)
                                  .build();
     }
 

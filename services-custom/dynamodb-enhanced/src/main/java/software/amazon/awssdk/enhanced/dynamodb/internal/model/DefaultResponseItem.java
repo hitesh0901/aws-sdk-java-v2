@@ -15,9 +15,13 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.internal.model;
 
+import static java.util.stream.Collectors.toMap;
+
+import java.util.Map;
 import software.amazon.awssdk.annotations.SdkInternalApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.enhanced.dynamodb.model.ConvertableItemAttributeValue;
+import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.ResponseItem;
 
 /**
@@ -32,6 +36,18 @@ public class DefaultResponseItem extends DefaultItem<ConvertableItemAttributeVal
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    @Override
+    public ConvertableItemAttributeValue toConvertable() {
+        return DefaultConvertableItemAttributeValue.builder()
+                                                   .conversionContext(c -> c.converter(converterChain))
+                                                   .attributeValue(ItemAttributeValue.fromMap(getRawAttributes()))
+                                                   .build();
+    }
+
+    private Map<String, ItemAttributeValue> getRawAttributes() {
+        return attributes().entrySet().stream().collect(toMap(e -> e.getKey(), e -> e.getValue().attributeValue()));
     }
 
     @Override
