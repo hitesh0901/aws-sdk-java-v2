@@ -26,7 +26,7 @@ import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionContext;
-import software.amazon.awssdk.enhanced.dynamodb.internal.converter.InstanceOfConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.InstanceOfConverter;
 import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeConvertingVisitor;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
@@ -38,9 +38,13 @@ import software.amazon.awssdk.utils.Validate;
 @SdkPublicApi
 @ThreadSafe
 @Immutable
-public final class ListConverter extends InstanceOfConverter<List<?>> {
-    public ListConverter() {
+public final class DynamicListConverter extends InstanceOfConverter<List<?>> {
+    public DynamicListConverter() {
         super(List.class);
+    }
+
+    public static DynamicListConverter create() {
+        return new DynamicListConverter();
     }
 
     @Override
@@ -61,7 +65,7 @@ public final class ListConverter extends InstanceOfConverter<List<?>> {
                         "The desired List type appears to be parameterized with more than 1 type: %s", desiredType);
         TypeToken<?> parameterType = listTypeParameters.get(0);
 
-        return input.convert(new TypeConvertingVisitor<List<?>>(List.class, ListConverter.class) {
+        return input.convert(new TypeConvertingVisitor<List<?>>(List.class, DynamicListConverter.class) {
             @Override
             public List<?> convertSetOfStrings(List<String> value) {
                 return convertCollection(value, ItemAttributeValue::fromString);

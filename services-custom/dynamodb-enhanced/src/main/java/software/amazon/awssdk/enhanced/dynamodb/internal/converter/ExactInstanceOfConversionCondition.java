@@ -18,6 +18,7 @@ package software.amazon.awssdk.enhanced.dynamodb.internal.converter;
 import software.amazon.awssdk.annotations.SdkInternalApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionCondition;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ExactInstanceOfConverter;
 import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.bundled.DefaultConverterChain;
 import software.amazon.awssdk.utils.Validate;
 

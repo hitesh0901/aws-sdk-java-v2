@@ -13,9 +13,9 @@
  * permissions and limitations under the License.
  */
 
-package software.amazon.awssdk.enhanced.dynamodb.internal.converter;
+package software.amazon.awssdk.enhanced.dynamodb.converter.attribute;
 
-import software.amazon.awssdk.annotations.SdkInternalApi;
+import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionCondition;
 import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionContext;
@@ -29,7 +29,7 @@ import software.amazon.awssdk.utils.Validate;
  * {@link ConversionCondition#isExactInstanceOf(Class)} conversion type. This handles casting to/from the mapped type and
  * validates that the converter is being invoked with the correct types.
  */
-@SdkInternalApi
+@SdkPublicApi
 @ThreadSafe
 public abstract class ExactInstanceOfConverter<T> implements ItemAttributeValueConverter {
     private final Class<T> type;
@@ -44,7 +44,7 @@ public abstract class ExactInstanceOfConverter<T> implements ItemAttributeValueC
     }
 
     @Override
-    public ItemAttributeValue toAttributeValue(Object input, ConversionContext context) {
+    public final ItemAttributeValue toAttributeValue(Object input, ConversionContext context) {
         Validate.isTrue(type.equals(input.getClass()),
                         "The input %s does not equal %s.", input.getClass(), type);
 
@@ -52,14 +52,14 @@ public abstract class ExactInstanceOfConverter<T> implements ItemAttributeValueC
     }
 
     @Override
-    public Object fromAttributeValue(ItemAttributeValue input, TypeToken<?> desiredType, ConversionContext context) {
+    public final Object fromAttributeValue(ItemAttributeValue input, TypeToken<?> desiredType, ConversionContext context) {
         Validate.isTrue(type.equals(desiredType.rawClass()),
                         "The desired type %s does not equal %s.", desiredType, type);
 
         return convertFromAttributeValue(input, desiredType, context);
     }
 
-    protected Class<T> type() {
+    public Class<T> type() {
         return type;
     }
 

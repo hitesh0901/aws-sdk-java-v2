@@ -13,9 +13,9 @@
  * permissions and limitations under the License.
  */
 
-package software.amazon.awssdk.enhanced.dynamodb.internal.converter;
+package software.amazon.awssdk.enhanced.dynamodb.converter.attribute;
 
-import software.amazon.awssdk.annotations.SdkInternalApi;
+import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionCondition;
 import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionContext;
@@ -29,7 +29,7 @@ import software.amazon.awssdk.utils.Validate;
  * {@link ConversionCondition#isInstanceOf(Class)} conversion type. This handles casting to/from the mapped type and
  * validates that the converter is being invoked with the correct types.
  */
-@SdkInternalApi
+@SdkPublicApi
 @ThreadSafe
 public abstract class InstanceOfConverter<T> implements ItemAttributeValueConverter {
     private final Class<T> type;
@@ -61,7 +61,7 @@ public abstract class InstanceOfConverter<T> implements ItemAttributeValueConver
         return convertFromAttributeValue(input, desiredType, context);
     }
 
-    protected Class<T> type() {
+    public Class<T> type() {
         return type;
     }
 

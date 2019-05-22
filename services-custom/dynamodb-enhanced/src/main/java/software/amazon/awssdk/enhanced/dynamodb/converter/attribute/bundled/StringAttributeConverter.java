@@ -28,7 +28,7 @@ import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionContext;
-import software.amazon.awssdk.enhanced.dynamodb.internal.converter.ExactInstanceOfConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ExactInstanceOfConverter;
 import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeConvertingVisitor;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
@@ -40,9 +40,13 @@ import software.amazon.awssdk.utils.BinaryUtils;
 @SdkPublicApi
 @ThreadSafe
 @Immutable
-public final class StringConverter extends ExactInstanceOfConverter<String> {
-    public StringConverter() {
+public final class StringAttributeConverter extends ExactInstanceOfConverter<String> {
+    private StringAttributeConverter() {
         super(String.class);
+    }
+
+    public static StringAttributeConverter create() {
+        return new StringAttributeConverter();
     }
 
     @Override
@@ -59,7 +63,7 @@ public final class StringConverter extends ExactInstanceOfConverter<String> {
         private static final Visitor INSTANCE = new Visitor();
 
         private Visitor() {
-            super(String.class, StringConverter.class);
+            super(String.class, StringAttributeConverter.class);
         }
 
         @Override

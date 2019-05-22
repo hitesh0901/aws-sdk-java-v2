@@ -27,86 +27,98 @@ import software.amazon.awssdk.utils.Validate;
 import software.amazon.awssdk.utils.builder.CopyableBuilder;
 import software.amazon.awssdk.utils.builder.ToCopyableBuilder;
 
-public final class BeanItemSchema implements ToCopyableBuilder<BeanItemSchema.Builder, BeanItemSchema> {
-    private final TypeToken<?> beanType;
-    private final Supplier<Object> constructor;
-    private final Map<String, BeanAttributeSchema> attributeSchemas;
+public final class BeanItemSchema<B> implements ToCopyableBuilder<BeanItemSchema.Builder<B>, BeanItemSchema<B>> {
+    private final TypeToken<B> beanType;
+    private final Supplier<? extends B> constructor;
+    private final Map<String, BeanAttributeSchema<B, ?>> attributeSchemas;
 
-    private BeanItemSchema(Builder builder) {
+    private BeanItemSchema(Builder<B> builder) {
         this.beanType = Validate.paramNotNull(builder.beanType, "beanType");
         this.constructor = Validate.paramNotNull(builder.constructor, "constructor");
         this.attributeSchemas = builder.attributeSchemas.stream().collect(Collectors.toMap(s -> s.attributeName(), s -> s));
     }
 
-    public static Builder builder() {
-        return new Builder();
+    public static <B> Builder<B> builder(Class<B> beanType) {
+        return new Builder<>(beanType);
     }
 
-    public TypeToken<?> beanType() {
+    public static <B> Builder<B> builder(TypeToken<B> beanType) {
+        return new Builder<>(beanType);
+    }
+
+    public TypeToken<B> beanType() {
         return beanType;
     }
 
-    public Supplier<Object> constructor() {
+    public Supplier<? extends B> constructor() {
         return constructor;
     }
 
-    public BeanAttributeSchema attributeSchema(String attributeName) {
+    public BeanAttributeSchema<B, ?> attributeSchema(String attributeName) {
         return attributeSchemas.get(attributeName);
     }
 
-    public Collection<BeanAttributeSchema> attributeSchemas() {
+    public Collection<BeanAttributeSchema<B, ?>> attributeSchemas() {
         return Collections.unmodifiableCollection(attributeSchemas.values());
     }
 
     @Override
-    public Builder toBuilder() {
-        return builder().beanType(beanType).constructor(constructor).addAttributeSchemas(attributeSchemas.values());
+    public Builder<B> toBuilder() {
+        return builder(beanType).constructor(constructor)
+                                .addAttributeSchemas(attributeSchemas.values());
     }
 
-    public static final class Builder implements CopyableBuilder<BeanItemSchema.Builder, BeanItemSchema> {
-        private TypeToken<?> beanType;
-        private Supplier<Object> constructor;
-        private Collection<BeanAttributeSchema> attributeSchemas = new ArrayList<>();
+    public static final class Builder<B> implements CopyableBuilder<BeanItemSchema.Builder<B>, BeanItemSchema<B>> {
+        private final TypeToken<B> beanType;
+        private Supplier<? extends B> constructor;
+        private Collection<BeanAttributeSchema<B, ?>> attributeSchemas = new ArrayList<>();
 
-        private Builder() {}
-
-        public Builder beanType(TypeToken<?> beanType) {
-            this.beanType = beanType;
-            return this;
+        private Builder(Class<B> beanType) {
+            this(TypeToken.from(beanType));
         }
 
-        public Builder constructor(Supplier<Object> constructor) {
+        private Builder(TypeToken<B> beanType) {
+            this.beanType = beanType;
+        }
+
+        public Builder<B> constructor(Supplier<? extends B> constructor) {
             this.constructor = constructor;
             return this;
         }
 
-        public Builder addAttributeSchemas(Collection<? extends BeanAttributeSchema> attributeSchemas) {
+        public Builder<B> addAttributeSchemas(Collection<? extends BeanAttributeSchema<B, ?>> attributeSchemas) {
             Validate.paramNotNull(attributeSchemas, "attributeSchemas");
             Validate.noNullElements(attributeSchemas, "Attribute schemas must not be null.");
             this.attributeSchemas.addAll(attributeSchemas);
             return this;
         }
 
-        public Builder addAttributeSchema(BeanAttributeSchema attributeSchema) {
+        public Builder<B> addAttributeSchema(BeanAttributeSchema<B, ?> attributeSchema) {
             Validate.paramNotNull(attributeSchema, "attributeSchema");
             this.attributeSchemas.add(attributeSchema);
             return this;
         }
 
-        public Builder addAttributeSchema(Consumer<BeanAttributeSchema.Builder> attributeSchemaConsumer) {
+        public <A> Builder<B> addAttributeSchema(Class<A> attributeType,
+                                                 Consumer<? super BeanAttributeSchema.Builder<B, A>> attributeSchemaConsumer) {
+            return addAttributeSchema(TypeToken.from(attributeType), attributeSchemaConsumer);
+        }
+
+        public <A> Builder<B> addAttributeSchema(TypeToken<A> attributeType,
+                                                 Consumer<? super BeanAttributeSchema.Builder<B, A>> attributeSchemaConsumer) {
             Validate.paramNotNull(attributeSchemaConsumer, "attributeSchemaConsumer");
-            BeanAttributeSchema.Builder schemaBuilder = BeanAttributeSchema.builder();
+            BeanAttributeSchema.Builder<B, A> schemaBuilder = BeanAttributeSchema.builder(beanType, attributeType);
             attributeSchemaConsumer.accept(schemaBuilder);
             return addAttributeSchema(schemaBuilder.build());
         }
 
-        public Builder clearAttributeSchemas() {
+        public Builder<B> clearAttributeSchemas() {
             this.attributeSchemas.clear();
             return this;
         }
 
-        public BeanItemSchema build() {
-            return new BeanItemSchema(this);
+        public BeanItemSchema<B> build() {
+            return new BeanItemSchema<>(this);
         }
     }
 }

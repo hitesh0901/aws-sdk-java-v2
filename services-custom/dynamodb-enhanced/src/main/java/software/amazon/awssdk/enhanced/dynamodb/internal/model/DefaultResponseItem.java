@@ -39,18 +39,6 @@ public class DefaultResponseItem extends DefaultItem<ConvertableItemAttributeVal
     }
 
     @Override
-    public ConvertableItemAttributeValue toConvertable() {
-        return DefaultConvertableItemAttributeValue.builder()
-                                                   .conversionContext(c -> c.converter(converterChain))
-                                                   .attributeValue(ItemAttributeValue.fromMap(getRawAttributes()))
-                                                   .build();
-    }
-
-    private Map<String, ItemAttributeValue> getRawAttributes() {
-        return attributes().entrySet().stream().collect(toMap(e -> e.getKey(), e -> e.getValue().attributeValue()));
-    }
-
-    @Override
     public Builder toBuilder() {
         return new Builder(this);
     }

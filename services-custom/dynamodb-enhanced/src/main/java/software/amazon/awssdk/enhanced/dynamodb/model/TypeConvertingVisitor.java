@@ -35,7 +35,7 @@ import software.amazon.awssdk.utils.Validate;
 @SdkPublicApi
 public abstract class TypeConvertingVisitor<T> {
     private final Class<? extends ItemAttributeValueConverter> converterClass;
-    private final Class<?> targetType;
+    protected final Class<?> targetType;
 
     /**
      * Called by subclasses to provide enhanced logging when a specific type isn't handled.

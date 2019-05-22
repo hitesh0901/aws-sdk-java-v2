@@ -18,110 +18,106 @@ package software.amazon.awssdk.enhanced.dynamodb.converter.item.bundled.bean;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ItemAttributeValueConverter;
-import software.amazon.awssdk.enhanced.dynamodb.converter.item.ItemConverter;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
-import software.amazon.awssdk.utils.Either;
 import software.amazon.awssdk.utils.Validate;
 import software.amazon.awssdk.utils.builder.CopyableBuilder;
 import software.amazon.awssdk.utils.builder.ToCopyableBuilder;
 
-public final class BeanAttributeSchema implements ToCopyableBuilder<BeanAttributeSchema.Builder, BeanAttributeSchema> {
+public final class BeanAttributeSchema<B, A>
+        implements ToCopyableBuilder<BeanAttributeSchema.Builder<B, A>, BeanAttributeSchema<B, A>> {
+    private final TypeToken<B> beanType;
+    private final TypeToken<A> attributeType;
     private final String attributeName;
-    private final Getter getter;
-    private final Setter setter;
-    private final TypeToken<?> setterInputType;
-    private final Either<ItemAttributeValueConverter, ItemConverter> converter;
+    private final Getter<B, A> getter;
+    private final Setter<B, A> setter;
+    private final ItemAttributeValueConverter converter;
 
-    private BeanAttributeSchema(Builder builder) {
+    private BeanAttributeSchema(Builder<B, A> builder) {
+        this.beanType = Validate.notNull(builder.beanType, "beanType");
+        this.attributeType = Validate.paramNotNull(builder.attributeType, "setterInputType");
         this.attributeName = Validate.paramNotBlank(builder.attributeName, "attributeName");
         this.getter = Validate.paramNotNull(builder.getter, "getter");
         this.setter = Validate.paramNotNull(builder.setter, "setter");
-        this.setterInputType = Validate.paramNotNull(builder.setterInputType, "setterInputType");
-
-        Validate.isTrue(builder.itemAttributeValueConverter == null || builder.itemConverter == null,
-                        "Only one converter type can be specified.");
-
-        this.converter = Either.fromNullable(builder.itemAttributeValueConverter, builder.itemConverter)
-                               .orElseThrow(() -> new IllegalStateException("Converter must not be null."));
+        this.converter = Validate.paramNotNull(builder.converter, "converter");
     }
 
-    public static Builder builder() {
-        return new Builder();
+    public static <B, A> Builder<B, A> builder(Class<B> beanType, Class<A> attributeType) {
+        return builder(TypeToken.from(beanType), TypeToken.from(attributeType));
+    }
+
+    public static <B, A> Builder<B, A> builder(TypeToken<B> beanType, TypeToken<A> attributeType) {
+        return new Builder<>(beanType, attributeType);
+    }
+
+    public TypeToken<A> attributeType() {
+        return attributeType;
     }
 
     public String attributeName() {
         return attributeName;
     }
 
-    public Getter getter() {
+    public Getter<B, A> getter() {
         return getter;
     }
 
-    public Setter setter() {
+    public Setter<B, A> setter() {
         return setter;
     }
 
-    public TypeToken<?> setterInputType() {
-        return setterInputType;
-    }
-
-    public Either<ItemAttributeValueConverter, ItemConverter> converter() {
+    public ItemAttributeValueConverter converter() {
         return converter;
     }
 
     @Override
-    public Builder toBuilder() {
-        return builder().attributeName(attributeName).getter(getter).setter(setter);
+    public Builder<B, A> toBuilder() {
+        return builder(beanType, attributeType).attributeName(attributeName)
+                                               .getter(getter)
+                                               .setter(setter)
+                                               .converter(converter);
     }
 
     @FunctionalInterface
-    public interface Setter extends BiConsumer<Object, Object> {}
+    public interface Setter<B, A> extends BiConsumer<B, A> {}
 
     @FunctionalInterface
-    public interface Getter extends Function<Object, Object> {}
+    public interface Getter<B, A> extends Function<B, A> {}
 
-    public static final class Builder implements CopyableBuilder<Builder, BeanAttributeSchema> {
+    public static final class Builder<B, A> implements CopyableBuilder<Builder<B, A>, BeanAttributeSchema<B, A>> {
+        private final TypeToken<B> beanType;
+        private final TypeToken<A> attributeType;
         private String attributeName;
-        private Getter getter;
-        private Setter setter;
-        private TypeToken<?> setterInputType;
-        private ItemAttributeValueConverter itemAttributeValueConverter;
-        private ItemConverter itemConverter;
+        private Getter<B, A> getter;
+        private Setter<B, A> setter;
+        private ItemAttributeValueConverter converter;
 
-        private Builder() {}
+        private Builder(TypeToken<B> beanType, TypeToken<A> attributeType) {
+            this.beanType = beanType;
+            this.attributeType = attributeType;
+        }
 
-        public Builder attributeName(String attributeName) {
+        public Builder<B, A> attributeName(String attributeName) {
             this.attributeName = attributeName;
             return this;
         }
 
-        public Builder getter(Getter getter) {
+        public Builder<B, A> getter(Getter<B, A> getter) {
             this.getter = getter;
             return this;
         }
 
-        public Builder setter(Setter setter) {
+        public Builder<B, A> setter(Setter<B, A> setter) {
             this.setter = setter;
             return this;
         }
 
-        public Builder setterInputType(TypeToken<?> setterInputType) {
-            this.setterInputType = setterInputType;
+        public Builder<B, A> converter(ItemAttributeValueConverter converter) {
+            this.converter = converter;
             return this;
         }
 
-        public Builder converter(ItemAttributeValueConverter itemAttributeValueConverter) {
-            this.itemAttributeValueConverter = itemAttributeValueConverter;
-            return this;
-        }
-
-        public Builder converter(ItemConverter itemConverter) {
-            this.itemConverter = itemConverter;
-            return this;
-        }
-
-        public BeanAttributeSchema build() {
-            return new BeanAttributeSchema(this);
+        public BeanAttributeSchema<B, A> build() {
+            return new BeanAttributeSchema<>(this);
         }
     }
 }

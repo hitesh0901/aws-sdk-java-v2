@@ -15,69 +15,88 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.item.bundled.bean;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionCondition;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionContext;
 import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ItemAttributeValueConverter;
-import software.amazon.awssdk.enhanced.dynamodb.converter.item.ItemConverter;
-import software.amazon.awssdk.enhanced.dynamodb.model.ConvertableItemAttributeValue;
-import software.amazon.awssdk.enhanced.dynamodb.model.RequestItem;
-import software.amazon.awssdk.enhanced.dynamodb.model.ResponseItem;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ExactInstanceOfConverter;
+import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeConvertingVisitor;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
-import software.amazon.awssdk.utils.Either;
 import software.amazon.awssdk.utils.Validate;
 
-public class StaticBeanItemConverter implements ItemConverter {
-    private final BeanItemSchema schema;
+public class StaticBeanItemConverter<T> extends ExactInstanceOfConverter<T> {
+    private final BeanItemSchema<T> schema;
 
-    public StaticBeanItemConverter(BeanItemSchema schema) {
+    private StaticBeanItemConverter(BeanItemSchema<T> schema) {
+        super(schema.beanType().rawClass());
         this.schema = schema;
     }
 
-    @Override
-    public RequestItem toRequestItem(Object request) {
-        RequestItem.Builder requestItem = RequestItem.builder();
-        schema.attributeSchemas().forEach(attributeSchema -> {
-            Object unmappedValue = attributeSchema.getter().apply(request);
-            Object mappedValue = mapValue(attributeSchema.converter(), attributeSchema, unmappedValue);
-            requestItem.putAttribute(attributeSchema.attributeName(), mappedValue);
-
-        });
-        return requestItem.build();
+    public static <T> StaticBeanItemConverter<T> create(BeanItemSchema<T> schema) {
+        return new StaticBeanItemConverter<>(schema);
     }
 
     @Override
-    public <T> T fromResponseItem(TypeToken<T> targetType, ResponseItem responseItem) {
-        Object response = schema.constructor().get();
-        Class<T> targetClass = targetType.rawClass();
-        T castResponse = Validate.isAssignableFrom(targetClass, response.getClass(),
-                                                   "Item constructor created a %s, but a %s was requested.",
-                                                   response.getClass(), targetClass)
-                                 .cast(response);
+    public ConversionCondition conversionCondition() {
+        return ConversionCondition.isExactInstanceOf(schema.beanType().rawClass());
+    }
 
+    @Override
+    public ItemAttributeValue convertToAttributeValue(T input, ConversionContext context) {
+        Map<String, ItemAttributeValue> mappedValues = new LinkedHashMap<>();
         schema.attributeSchemas().forEach(attributeSchema -> {
-            ConvertableItemAttributeValue mappedValue = responseItem.attribute(attributeSchema.attributeName());
-            Object unmappedValue = unmapValue(attributeSchema.converter(), attributeSchema, mappedValue);
-            attributeSchema.setter().accept(castResponse, unmappedValue);
+            Object unmappedValue = attributeSchema.getter().apply(input);
+            if (unmappedValue != null) {
+                ItemAttributeValue mappedValue =
+                        attributeSchema.converter()
+                                       .toAttributeValue(unmappedValue, ctx -> ctx.attributeName(attributeSchema.attributeName())
+                                                                                  .converter(attributeSchema.converter()));
+
+                mappedValues.put(attributeSchema.attributeName(), mappedValue);
+            }
         });
-
-        return castResponse;
+        return ItemAttributeValue.fromMap(mappedValues);
     }
 
-    private Object mapValue(Either<ItemAttributeValueConverter, ItemConverter> converters,
-                            BeanAttributeSchema attributeSchema,
-                            Object unmappedValue) {
-        return converters.map(
-                c -> c.toAttributeValue(unmappedValue, i -> i.attributeName(attributeSchema.attributeName())
-                                                             .converter(c)),
-                c -> c.toRequestItem(unmappedValue));
+    @Override
+    public T convertFromAttributeValue(ItemAttributeValue input, TypeToken<?> desiredType, ConversionContext context) {
+        return input.convert(new Visitor(desiredType.rawClass()));
     }
 
-    private Object unmapValue(Either<ItemAttributeValueConverter, ItemConverter> converters,
-                              BeanAttributeSchema attributeSchema,
-                              ConvertableItemAttributeValue mappedValue) {
-        return converters.map(
-                c -> c.fromAttributeValue(
-                        mappedValue.attributeValue(),
-                        attributeSchema.setterInputType(),
-                        i -> i.attributeName(attributeSchema.attributeName()).converter(c)),
-                c -> c.fromResponseItem(attributeSchema.setterInputType(), mappedValue.as(ResponseItem.class)));
+    private class Visitor extends TypeConvertingVisitor<T> {
+        private Visitor(Class<?> targetType) {
+            super(targetType, StaticBeanItemConverter.class);
+        }
+
+        @Override
+        public T convertMap(Map<String, ItemAttributeValue> value) {
+            T response = schema.constructor().get();
+
+            Validate.isInstanceOf(targetType, response,
+                                  "Item constructor created a %s, but a %s was requested.",
+                                  response.getClass(), targetType);
+
+            schema.attributeSchemas().forEach(attributeSchema -> {
+                ItemAttributeValue mappedValue = value.get(attributeSchema.attributeName());
+                convertAndSet(mappedValue, response, attributeSchema);
+            });
+
+            return response;
+        }
+
+        private <U> void convertAndSet(ItemAttributeValue mappedValue,
+                                       T response,
+                                       BeanAttributeSchema<T, U> attributeSchema) {
+            ItemAttributeValueConverter converter = attributeSchema.converter();
+            Object unmappedValue =
+                    converter.fromAttributeValue(
+                            mappedValue,
+                            attributeSchema.attributeType(),
+                            ctx -> ctx.attributeName(attributeSchema.attributeName()).converter(converter));
+
+            attributeSchema.setter().accept(response, attributeSchema.attributeType().rawClass().cast(unmappedValue));
+        }
     }
 }

@@ -116,7 +116,7 @@ public final class ItemAttributeValueConverterChain implements ItemAttributeValu
      * Find a converter that matches the provided type. If one cannot be found, throw an exception.
      */
     private ItemAttributeValueConverter findRequiredConverter(Class<?> type) {
-        return findConverter(type).orElseThrow(() -> new IllegalStateException("Converter not found for" + type.getTypeName()));
+        return findConverter(type).orElseThrow(() -> new IllegalStateException("Converter not found for " + type.getTypeName()));
     }
 
     /**

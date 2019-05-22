@@ -24,7 +24,7 @@ import software.amazon.awssdk.annotations.Immutable;
 import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionContext;
-import software.amazon.awssdk.enhanced.dynamodb.internal.converter.InstanceOfConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.InstanceOfConverter;
 import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeConvertingVisitor;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
@@ -36,16 +36,20 @@ import software.amazon.awssdk.utils.Validate;
 @SdkPublicApi
 @ThreadSafe
 @Immutable
-public final class MapConverter extends InstanceOfConverter<Map<?, ?>> {
+public final class DynamicMapConverter extends InstanceOfConverter<Map<?, ?>> {
     private final Function<Object, String> keyToStringConverter;
 
-    public MapConverter() {
+    private DynamicMapConverter() {
         this(Object::toString);
     }
 
-    public MapConverter(Function<Object, String> keyToStringConverter) {
+    private DynamicMapConverter(Function<Object, String> keyToStringConverter) {
         super(Map.class);
         this.keyToStringConverter = keyToStringConverter;
+    }
+
+    public static DynamicMapConverter create() {
+        return new DynamicMapConverter();
     }
 
     @Override
@@ -66,7 +70,7 @@ public final class MapConverter extends InstanceOfConverter<Map<?, ?>> {
         TypeToken<?> keyType = mapTypeParameters.get(0);
         TypeToken<?> valueType = mapTypeParameters.get(1);
 
-        return input.convert(new TypeConvertingVisitor<Map<?, ?>>(Map.class, MapConverter.class) {
+        return input.convert(new TypeConvertingVisitor<Map<?, ?>>(Map.class, DynamicMapConverter.class) {
             @Override
             public Map<?, ?> convertMap(Map<String, ItemAttributeValue> value) {
                 Map<Object, Object> result = createMap(mapType);

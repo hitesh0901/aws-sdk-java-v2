@@ -24,6 +24,7 @@ import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ItemAttribut
 import software.amazon.awssdk.enhanced.dynamodb.model.GeneratedResponseItem;
 import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.ResponseItem;
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
@@ -59,13 +60,12 @@ public class DefaultMappedTable implements MappedTable {
     public <T extends U, U> T getItem(Class<T> outputType, U key) {
         GetItemResponse response = client.getItem(r -> r.tableName(tableName).key(convertToGeneratedItem(key)));
 
-        ResponseItem responseItem = GeneratedResponseItem.builder()
-                                                         .putAttributes(response.item())
-                                                         .addConverter(converter)
-                                                         .build()
-                                                         .toResponseItem();
+        Object output = converter.fromAttributeValue(ItemAttributeValue.fromGeneratedItem(response.item()),
+                                                     TypeToken.from(outputType),
+                                                     c ->c.converter(converter));
 
-        return responseItem.toConvertable().as(outputType);
+        return Validate.isInstanceOf(outputType, output,
+                                     "Converter generated a %s when a %s was requested.", output.getClass(), outputType);
     }
 
     @Override

@@ -79,18 +79,18 @@ public final class DefaultConverterChain implements ItemAttributeValueConverter 
         CHAIN = ItemAttributeValueConverterChain.builder()
                                                 // Exact InstanceOf Converters
 
-                                                .addConverter(new InstantConverter())
-                                                .addConverter(new IntegerConverter())
-                                                .addConverter(new StringConverter())
-                                                .addConverter(new IdentityConverter())
+                                                .addConverter(InstantConverter.create())
+                                                .addConverter(IntegerConverter.create())
+                                                .addConverter(StringAttributeConverter.create())
+                                                .addConverter(IdentityConverter.create())
 
                                                 // InstanceOf Converters
                                                 // Potential optimization: allow InstanceOf converters to specify a set of
                                                 // types that should be cached in an eager fashion (e.g. DefaultRequestItem)
-                                                .addConverter(new RequestItemConverter())
-                                                .addConverter(new ResponseItemConverter())
-                                                .addConverter(new ListConverter())
-                                                .addConverter(new MapConverter())
+                                                .addConverter(RequestItemConverter.create())
+                                                .addConverter(ResponseItemConverter.create())
+                                                .addConverter(DynamicListConverter.create())
+                                                .addConverter(DynamicMapConverter.create())
                                                 .build();
     }
 

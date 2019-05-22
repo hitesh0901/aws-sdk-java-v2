@@ -19,7 +19,7 @@ import software.amazon.awssdk.annotations.Immutable;
 import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionContext;
-import software.amazon.awssdk.enhanced.dynamodb.internal.converter.ExactInstanceOfConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ExactInstanceOfConverter;
 import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 
@@ -30,8 +30,12 @@ import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 @ThreadSafe
 @Immutable
 public final class IdentityConverter extends ExactInstanceOfConverter<ItemAttributeValue> {
-    public IdentityConverter() {
+    private IdentityConverter() {
         super(ItemAttributeValue.class);
+    }
+
+    public static IdentityConverter create() {
+        return new IdentityConverter();
     }
 
     @Override

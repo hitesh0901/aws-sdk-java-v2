@@ -51,8 +51,6 @@ public interface ResponseItem extends AttributeAware<ConvertableItemAttributeVal
         return DefaultResponseItem.builder();
     }
 
-    ConvertableItemAttributeValue toConvertable();
-
     /**
      * A builder that can be used for configuring and creating a {@link ResponseItem}.
      */
