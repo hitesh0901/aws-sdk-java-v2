@@ -15,15 +15,25 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
-public interface StringConverters {
-    static StringConverters defaultStringConverters() {
-        return DefaultStringConverters.instance();
+import java.util.function.Function;
+
+public class SimpleStringConverter<T> implements StringConverter<T> {
+    private final Function<? super T, String> toString;
+    private final Function<String, ? extends T> fromString;
+
+    public SimpleStringConverter(Function<? super T, String> toString,
+                                 Function<String, ? extends T> fromString) {
+        this.toString = toString;
+        this.fromString = fromString;
     }
 
-    static StringConverters of(StringConverter<?> converter) {
-
+    @Override
+    public String toString(T object) {
+        return toString.apply(object);
     }
 
-    String toString(Object input);
-    <T> T fromString(Class<T> targetType, String input);
+    @Override
+    public T fromString(String string) {
+        return fromString.apply(string);
+    }
 }

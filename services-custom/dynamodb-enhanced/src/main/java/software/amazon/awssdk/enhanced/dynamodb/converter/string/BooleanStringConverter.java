@@ -15,20 +15,5 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
-public class StaticStringConverters implements StringConverters {
-    private final StringConverter<?> converter;
-
-    public StaticStringConverters(StringConverter<?> converter) {
-        this.converter = converter;
-    }
-
-    @Override
-    public String toString(Object input) {
-        return null;
-    }
-
-    @Override
-    public <T> T fromString(Class<T> targetType, String input) {
-        return null;
-    }
+public class BooleanStringConverter {
 }

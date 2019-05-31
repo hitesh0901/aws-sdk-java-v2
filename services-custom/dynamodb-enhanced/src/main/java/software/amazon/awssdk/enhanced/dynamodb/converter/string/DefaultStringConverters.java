@@ -48,17 +48,17 @@ import java.util.function.Function;
 import software.amazon.awssdk.utils.BinaryUtils;
 import software.amazon.awssdk.utils.Validate;
 
-public class DefaultStringConverters implements StringConverters {
-    private static DefaultStringConverters INSTANCE = new DefaultStringConverters();
+public class DefaultStringConverter implements StringConverter {
+    private final Map<Class<?>, StringConverter> converters;
 
-    private final Map<Class<Object>, StringConverter<Object>> converters;
+    private static final DefaultStringConverter INSTANCE = new DefaultStringConverter();
 
-    public static StringConverters instance() {
+    public static DefaultStringConverter instance() {
         return INSTANCE;
     }
 
-    private DefaultStringConverters() {
-        Map<Class<Object>, StringConverter<Object>> converters = new HashMap<>();
+    private DefaultStringConverter() {
+        Map<Class<Object>, StringConverter> converters = new HashMap<>();
 
         // Primitive Types
         addConverter(converters, boolean.class, Object::toString, this::stringToBoolean);
@@ -209,41 +209,43 @@ public class DefaultStringConverters implements StringConverters {
         return targetType.cast(getConverter(targetType).fromString(input));
     }
 
-    private StringConverter<Object> getConverter(Class<?> clazz) {
-        StringConverter<Object> converter = converters.get(clazz);
+    private StringConverter getConverter(Class<?> clazz) {
+        StringConverter converter = converters.get(clazz);
         if (converter == null) {
             throw new IllegalArgumentException("No string converter exists for " + clazz);
         }
         return converter;
     }
 
-    @SuppressWarnings("unchecked") // The method signature ensures this is safe
-    private <T> void addConverter(Map<Class<Object>, StringConverter<Object>> converters,
+    private <T> void addConverter(Map<Class<?>, StringConverter> converters,
                                   Class<T> convertedType,
                                   Function<T, String> toString,
                                   Function<String, ? extends T> fromString) {
-        converters.put((Class<Object>) convertedType,
-                       (SimpleStringConverter<Object>) new SimpleStringConverter<>(toString, fromString));
+        converters.put(convertedType, new SimpleStringConverter<>(toString, fromString));
     }
 
     private static final class SimpleStringConverter<T> implements StringConverter<T> {
+        private final Class<T> type;
         private final Function<T, String> toString;
         private final Function<String, ? extends T> fromString;
 
-        public SimpleStringConverter(Function<T, String> toString,
+        public SimpleStringConverter(Class<T> type,
+                                     Function<T, String> toString,
                                      Function<String, ? extends T> fromString) {
+            this.type = type;
             this.toString = toString;
             this.fromString = fromString;
         }
 
         @Override
-        public String toString(T object) {
-            return toString.apply(object);
+        public String toString(Object object) {
+            return toString.apply(type.cast(object));
         }
 
         @Override
-        public T fromString(String string) {
-            return fromString.apply(string);
+        public <T> T fromString(Class<T> type, String string) {
+            Validate.isTrue(type.equals(this.type), type + " is not supported.");
+            return type.cast(fromString.apply(string));
         }
     }
 }
