@@ -32,6 +32,7 @@ import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.bundled.Stat
 import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.bundled.StringAttributeConverter;
 import software.amazon.awssdk.enhanced.dynamodb.converter.item.bundled.bean.BeanItemSchema;
 import software.amazon.awssdk.enhanced.dynamodb.converter.item.bundled.bean.StaticBeanItemConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.string.StringConverter;
 import software.amazon.awssdk.enhanced.dynamodb.model.RequestItem;
 import software.amazon.awssdk.enhanced.dynamodb.model.ResponseItem;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
@@ -142,26 +143,38 @@ BeanItemSchema<?> bookSchema =
                                .getter(Book::getTitle)
                                .converter(StringAttributeConverter.create()))
 
+                      .addAttributeSchema(TypeToken.listOf(String.class), a ->
+                              a.attributeName("authors")
+                               .setter(Book::setAuthors)
+                               .getter(Book::getAuthors)
+                               .converter(StaticListConverter.create(StringAttributeConverter.create())))
+
+                      .addAttributeSchema(TypeToken.mapOf(String.class, Instant.class), a ->
+                              a.attributeName("authors")
+                               .setter(Book::setPublicationDates)
+                               .getter(Book::getPublicationDates)
+                               .converter(StaticMapConverter.create(null, InstantConverter.create())))
+
                       .build();
 
-try (DynamoDbEnhancedClient client = DynamoDbEnhancedClient.builder()
-                                                           .dynamoDbClient(dynamo)
-                                                           .addConverter(StaticBeanItemConverter.create(bookSchema))
-                                                           .build()) {
-    MappedTable books = client.mappedTable("books");
+        try (DynamoDbEnhancedClient client = DynamoDbEnhancedClient.builder()
+                                                                   .dynamoDbClient(dynamo)
+                                                                   .addConverter(StaticBeanItemConverter.create(bookSchema))
+                                                                   .build()) {
+            MappedTable books = client.mappedTable("books");
 
-    System.out.println("Putting item...");
+            System.out.println("Putting item...");
 
-    books.putItem(requestObject());
+            books.putItem(requestObject());
 
-    Thread.sleep(5_000);
+            Thread.sleep(5_000);
 
-    System.out.println("Getting item...");
+            System.out.println("Getting item...");
 
-    Book book = books.getItem(Book.class, requestObjectKey());
+            Book book = books.getItem(Book.class, requestObjectKey());
 
-    validateResponseObject(book);
-}
+            validateResponseObject(book);
+        }
     }
 
     private RequestItem requestItem() {

@@ -40,7 +40,7 @@ public class StaticMapConverter extends InstanceOfConverter<Map<?, ?>> {
         this.valueConverter = valueConverter;
     }
 
-    public static StaticMapConverter create(StringConverter<?> keyConverter,
+    public static StaticMapConverter create(StringConverter keyConverter,
                                             ExactInstanceOfConverter<?> valueConverter) {
         return new StaticMapConverter(keyConverter, valueConverter);
     }

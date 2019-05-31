@@ -62,14 +62,18 @@ public class TypeToken<T> {
     private TypeToken(Type type) {
         if (type == null) {
             type = captureGenericTypeArguments();
+        } else {
+            validateIsSupportedType(type);
         }
 
         this.rawClass = validateAndConvert(type);
         this.rawClassParameters = loadTypeParameters(type);
     }
 
-    private static TypeToken<?> from(Type type) {
-        return new TypeToken<>(validateIsSupportedType(type));
+    private TypeToken(Class<?> rawClass, List<TypeToken<?>> rawClassParameters) {
+        // This is only used internally, so we can make sure this cast is safe via testing.
+        this.rawClass = (Class<T>) rawClass;
+        this.rawClassParameters = rawClassParameters;
     }
 
     /**
@@ -82,7 +86,7 @@ public class TypeToken<T> {
      * </ol>
      */
     public static <T> TypeToken<T> from(Class<T> type) {
-        return new TypeToken<>(validateIsSupportedType(type));
+        return new TypeToken<>(type);
     }
 
     /**
@@ -109,6 +113,32 @@ public class TypeToken<T> {
      */
     public static <T, U> TypeToken<Map<T, U>> mapOf(Class<T> keyType, Class<U> valueType) {
         return new TypeToken<>(DefaultParameterizedType.parameterizedType(Map.class, keyType, valueType));
+    }
+
+    /**
+     * Create a type token for a list, with the provided value type class.
+     *
+     * <p>
+     * Reasons this call may fail with a {@link RuntimeException}:
+     * <ol>
+     *     <li>If the provided type is null.</li>
+     * </ol>
+     */
+    public static <T> TypeToken<List<T>> listOf(TypeToken<T> valueType) {
+        return new TypeToken<>(List.class, Arrays.asList(valueType));
+    }
+
+    /**
+     * Create a type token for a map, with the provided key and value type classes.
+     *
+     * <p>
+     * Reasons this call may fail with a {@link RuntimeException}:
+     * <ol>
+     *     <li>If the provided types are null.</li>
+     * </ol>
+     */
+    public static <T, U> TypeToken<Map<T, U>> mapOf(TypeToken<T> keyType, TypeToken<U> valueType) {
+        return new TypeToken<>(Map.class, Arrays.asList(keyType, valueType));
     }
 
     private static Type validateIsSupportedType(Type type) {

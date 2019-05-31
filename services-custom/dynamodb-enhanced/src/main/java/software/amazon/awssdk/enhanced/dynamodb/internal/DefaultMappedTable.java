@@ -58,7 +58,8 @@ public class DefaultMappedTable implements MappedTable {
 
     @Override
     public <T extends U, U> T getItem(Class<T> outputType, U key) {
-        GetItemResponse response = client.getItem(r -> r.tableName(tableName).key(convertToGeneratedItem(key)));
+        GetItemResponse response = client.getItem(r -> r.tableName(tableName)
+                                                        .key(convertToGeneratedItem(key)));
 
         Object output = converter.fromAttributeValue(ItemAttributeValue.fromGeneratedItem(response.item()),
                                                      TypeToken.from(outputType),
