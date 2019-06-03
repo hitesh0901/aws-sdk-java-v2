@@ -44,7 +44,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class DefaultStringConverter implements UntypedStringConverter {
+public class DefaultStringConverter implements SubtypeStringConverter<Object> {
     private final Map<Class<?>, StringConverter<?>> converters;
 
     private static final DefaultStringConverter INSTANCE = new DefaultStringConverter();
