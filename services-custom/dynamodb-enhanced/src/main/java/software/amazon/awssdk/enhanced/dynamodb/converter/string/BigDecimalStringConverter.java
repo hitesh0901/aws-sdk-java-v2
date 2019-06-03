@@ -15,10 +15,17 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
-public interface StringConverter<T> {
-    default String toString(T object) {
-        return object.toString();
+import java.math.BigDecimal;
+
+public class BigDecimalStringConverter implements StringConverter<BigDecimal> {
+    private BigDecimalStringConverter() { }
+
+    public static BigDecimalStringConverter create() {
+        return new BigDecimalStringConverter();
     }
 
-    T fromString(String string);
+    @Override
+    public BigDecimal fromString(String string) {
+        return new BigDecimal(string);
+    }
 }

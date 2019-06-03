@@ -15,10 +15,22 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
-public interface StringConverter<T> {
-    default String toString(T object) {
-        return object.toString();
+import software.amazon.awssdk.utils.BinaryUtils;
+
+public class ByteArrayStringConverter implements StringConverter<byte[]> {
+    private ByteArrayStringConverter() { }
+
+    public static ByteArrayStringConverter create() {
+        return new ByteArrayStringConverter();
     }
 
-    T fromString(String string);
+    @Override
+    public String toString(byte[] object) {
+        return BinaryUtils.toBase64(object);
+    }
+
+    @Override
+    public byte[] fromString(String string) {
+        return BinaryUtils.fromBase64(string);
+    }
 }

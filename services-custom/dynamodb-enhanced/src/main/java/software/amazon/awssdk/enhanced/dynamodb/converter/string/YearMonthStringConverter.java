@@ -15,10 +15,17 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
-public interface StringConverter<T> {
-    default String toString(T object) {
-        return object.toString();
+import java.time.YearMonth;
+
+public class YearMonthStringConverter implements StringConverter<YearMonth> {
+    private YearMonthStringConverter() { }
+
+    public static YearMonthStringConverter create() {
+        return new YearMonthStringConverter();
     }
 
-    T fromString(String string);
+    @Override
+    public YearMonth fromString(String string) {
+        return YearMonth.parse(string);
+    }
 }

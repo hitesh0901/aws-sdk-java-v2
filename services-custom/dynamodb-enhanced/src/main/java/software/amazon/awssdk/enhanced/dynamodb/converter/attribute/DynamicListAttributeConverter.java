@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-package software.amazon.awssdk.enhanced.dynamodb.converter.attribute.bundled;
+package software.amazon.awssdk.enhanced.dynamodb.converter.attribute;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -25,8 +25,6 @@ import software.amazon.awssdk.annotations.Immutable;
 import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.core.SdkBytes;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionContext;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.InstanceOfConverter;
 import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeConvertingVisitor;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
@@ -38,13 +36,13 @@ import software.amazon.awssdk.utils.Validate;
 @SdkPublicApi
 @ThreadSafe
 @Immutable
-public final class DynamicListConverter extends InstanceOfConverter<List<?>> {
-    public DynamicListConverter() {
+public final class DynamicListAttributeConverter extends InstanceOfAttributeConverter<List<?>> {
+    public DynamicListAttributeConverter() {
         super(List.class);
     }
 
-    public static DynamicListConverter create() {
-        return new DynamicListConverter();
+    public static DynamicListAttributeConverter create() {
+        return new DynamicListAttributeConverter();
     }
 
     @Override
@@ -65,7 +63,7 @@ public final class DynamicListConverter extends InstanceOfConverter<List<?>> {
                         "The desired List type appears to be parameterized with more than 1 type: %s", desiredType);
         TypeToken<?> parameterType = listTypeParameters.get(0);
 
-        return input.convert(new TypeConvertingVisitor<List<?>>(List.class, DynamicListConverter.class) {
+        return input.convert(new TypeConvertingVisitor<List<?>>(List.class, DynamicListAttributeConverter.class) {
             @Override
             public List<?> convertSetOfStrings(List<String> value) {
                 return convertCollection(value, ItemAttributeValue::fromString);

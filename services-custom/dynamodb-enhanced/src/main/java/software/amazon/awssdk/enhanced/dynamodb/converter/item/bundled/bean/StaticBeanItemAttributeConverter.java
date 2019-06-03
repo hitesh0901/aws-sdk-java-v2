@@ -20,22 +20,22 @@ import java.util.Map;
 import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionCondition;
 import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionContext;
 import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ItemAttributeValueConverter;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ExactInstanceOfConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ExactInstanceOfAttributeConverter;
 import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeConvertingVisitor;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 import software.amazon.awssdk.utils.Validate;
 
-public class StaticBeanItemConverter<T> extends ExactInstanceOfConverter<T> {
+public class StaticBeanItemAttributeConverter<T> extends ExactInstanceOfAttributeConverter<T> {
     private final BeanItemSchema<T> schema;
 
-    private StaticBeanItemConverter(BeanItemSchema<T> schema) {
+    private StaticBeanItemAttributeConverter(BeanItemSchema<T> schema) {
         super(schema.beanType().rawClass());
         this.schema = schema;
     }
 
-    public static <T> StaticBeanItemConverter<T> create(BeanItemSchema<T> schema) {
-        return new StaticBeanItemConverter<>(schema);
+    public static <T> StaticBeanItemAttributeConverter<T> create(BeanItemSchema<T> schema) {
+        return new StaticBeanItemAttributeConverter<>(schema);
     }
 
     @Override
@@ -67,7 +67,7 @@ public class StaticBeanItemConverter<T> extends ExactInstanceOfConverter<T> {
 
     private class Visitor extends TypeConvertingVisitor<T> {
         private Visitor(Class<?> targetType) {
-            super(targetType, StaticBeanItemConverter.class);
+            super(targetType, StaticBeanItemAttributeConverter.class);
         }
 
         @Override

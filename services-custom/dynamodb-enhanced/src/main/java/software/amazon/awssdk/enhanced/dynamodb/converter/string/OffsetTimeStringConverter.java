@@ -15,10 +15,17 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
-public interface StringConverter<T> {
-    default String toString(T object) {
-        return object.toString();
+import java.time.OffsetTime;
+
+public class OffsetTimeStringConverter implements StringConverter<OffsetTime> {
+    private OffsetTimeStringConverter() { }
+
+    public static OffsetTimeStringConverter create() {
+        return new OffsetTimeStringConverter();
     }
 
-    T fromString(String string);
+    @Override
+    public OffsetTime fromString(String string) {
+        return OffsetTime.parse(string);
+    }
 }

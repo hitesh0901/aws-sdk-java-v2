@@ -26,13 +26,12 @@ import java.util.UUID;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.bundled.InstantConverter;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.bundled.StaticListConverter;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.bundled.StaticMapConverter;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.bundled.StringAttributeConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.InstantAttributeConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.StaticListAttributeConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.StaticMapAttributeConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.StringAttributeAttributeConverter;
 import software.amazon.awssdk.enhanced.dynamodb.converter.item.bundled.bean.BeanItemSchema;
-import software.amazon.awssdk.enhanced.dynamodb.converter.item.bundled.bean.StaticBeanItemConverter;
-import software.amazon.awssdk.enhanced.dynamodb.converter.string.StringConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.item.bundled.bean.StaticBeanItemAttributeConverter;
 import software.amazon.awssdk.enhanced.dynamodb.model.RequestItem;
 import software.amazon.awssdk.enhanced.dynamodb.model.ResponseItem;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
@@ -135,31 +134,32 @@ BeanItemSchema<?> bookSchema =
                               a.attributeName("isbn")
                                .setter(Book::setIsbn)
                                .getter(Book::getIsbn)
-                               .converter(StringAttributeConverter.create()))
+                               .converter(StringAttributeAttributeConverter.create()))
 
                       .addAttributeSchema(String.class, a ->
                               a.attributeName("title")
                                .setter(Book::setTitle)
                                .getter(Book::getTitle)
-                               .converter(StringAttributeConverter.create()))
+                               .converter(StringAttributeAttributeConverter.create()))
 
                       .addAttributeSchema(TypeToken.listOf(String.class), a ->
                               a.attributeName("authors")
                                .setter(Book::setAuthors)
                                .getter(Book::getAuthors)
-                               .converter(StaticListConverter.create(StringAttributeConverter.create())))
+                               .converter(StaticListAttributeConverter.create(StringAttributeAttributeConverter.create())))
 
                       .addAttributeSchema(TypeToken.mapOf(String.class, Instant.class), a ->
                               a.attributeName("authors")
                                .setter(Book::setPublicationDates)
                                .getter(Book::getPublicationDates)
-                               .converter(StaticMapConverter.create(null, InstantConverter.create())))
+                               .converter(StaticMapAttributeConverter.create(null, InstantAttributeConverter.create())))
 
                       .build();
 
         try (DynamoDbEnhancedClient client = DynamoDbEnhancedClient.builder()
                                                                    .dynamoDbClient(dynamo)
-                                                                   .addConverter(StaticBeanItemConverter.create(bookSchema))
+                                                                   .addConverter(
+                                                                           StaticBeanItemAttributeConverter.create(bookSchema))
                                                                    .build()) {
             MappedTable books = client.mappedTable("books");
 

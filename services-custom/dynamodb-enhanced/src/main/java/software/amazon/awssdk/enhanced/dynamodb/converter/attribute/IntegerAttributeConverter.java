@@ -13,14 +13,12 @@
  * permissions and limitations under the License.
  */
 
-package software.amazon.awssdk.enhanced.dynamodb.converter.attribute.bundled;
+package software.amazon.awssdk.enhanced.dynamodb.converter.attribute;
 
 import java.time.Instant;
 import software.amazon.awssdk.annotations.Immutable;
 import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionContext;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ExactInstanceOfConverter;
 import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeConvertingVisitor;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
@@ -31,13 +29,13 @@ import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 @SdkPublicApi
 @ThreadSafe
 @Immutable
-public final class IntegerConverter extends ExactInstanceOfConverter<Integer> {
-    private IntegerConverter() {
+public final class IntegerAttributeConverter extends ExactInstanceOfAttributeConverter<Integer> {
+    private IntegerAttributeConverter() {
         super(Integer.class);
     }
 
-    public static IntegerConverter create() {
-        return new IntegerConverter();
+    public static IntegerAttributeConverter create() {
+        return new IntegerAttributeConverter();
     }
 
     @Override
@@ -54,7 +52,7 @@ public final class IntegerConverter extends ExactInstanceOfConverter<Integer> {
         private static final Visitor INSTANCE = new Visitor();
 
         private Visitor() {
-            super(Instant.class, IntegerConverter.class);
+            super(Instant.class, IntegerAttributeConverter.class);
         }
 
         @Override

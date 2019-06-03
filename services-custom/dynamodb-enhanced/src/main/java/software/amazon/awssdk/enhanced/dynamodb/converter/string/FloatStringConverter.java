@@ -15,10 +15,15 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
-public interface StringConverter<T> {
-    default String toString(T object) {
-        return object.toString();
+public class FloatStringConverter implements StringConverter<Float> {
+    private FloatStringConverter() { }
+
+    public static FloatStringConverter create() {
+        return new FloatStringConverter();
     }
 
-    T fromString(String string);
+    @Override
+    public Float fromString(String string) {
+        return Float.valueOf(string);
+    }
 }

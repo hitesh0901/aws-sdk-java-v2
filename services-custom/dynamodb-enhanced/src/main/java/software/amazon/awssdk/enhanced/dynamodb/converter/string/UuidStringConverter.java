@@ -15,10 +15,17 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
-public interface StringConverter<T> {
-    default String toString(T object) {
-        return object.toString();
+import java.util.UUID;
+
+public class UuidStringConverter implements StringConverter<UUID> {
+    private UuidStringConverter() { }
+
+    public static UuidStringConverter create() {
+        return new UuidStringConverter();
     }
 
-    T fromString(String string);
+    @Override
+    public UUID fromString(String string) {
+        return UUID.fromString(string);
+    }
 }

@@ -15,10 +15,17 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
-public interface StringConverter<T> {
-    default String toString(T object) {
-        return object.toString();
+import java.net.URI;
+
+public class UriStringConverter implements StringConverter<URI> {
+    private UriStringConverter() { }
+
+    public static UriStringConverter create() {
+        return new UriStringConverter();
     }
 
-    T fromString(String string);
+    @Override
+    public URI fromString(String string) {
+        return URI.create(string);
+    }
 }

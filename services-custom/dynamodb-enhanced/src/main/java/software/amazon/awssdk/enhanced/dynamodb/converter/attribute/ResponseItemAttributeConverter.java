@@ -13,15 +13,13 @@
  * permissions and limitations under the License.
  */
 
-package software.amazon.awssdk.enhanced.dynamodb.converter.attribute.bundled;
+package software.amazon.awssdk.enhanced.dynamodb.converter.attribute;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import software.amazon.awssdk.annotations.Immutable;
 import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionContext;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ExactInstanceOfConverter;
 import software.amazon.awssdk.enhanced.dynamodb.internal.model.DefaultConvertableItemAttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.ConvertableItemAttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;
@@ -35,13 +33,13 @@ import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 @SdkPublicApi
 @ThreadSafe
 @Immutable
-public final class ResponseItemConverter extends ExactInstanceOfConverter<ResponseItem> {
-    private ResponseItemConverter() {
+public final class ResponseItemAttributeConverter extends ExactInstanceOfAttributeConverter<ResponseItem> {
+    private ResponseItemAttributeConverter() {
         super(ResponseItem.class);
     }
 
-    public static ResponseItemConverter create() {
-        return new ResponseItemConverter();
+    public static ResponseItemAttributeConverter create() {
+        return new ResponseItemAttributeConverter();
     }
 
     @Override
@@ -53,7 +51,7 @@ public final class ResponseItemConverter extends ExactInstanceOfConverter<Respon
     protected ResponseItem convertFromAttributeValue(ItemAttributeValue input,
                                                      TypeToken<?> desiredType,
                                                      ConversionContext context) {
-        return input.convert(new TypeConvertingVisitor<ResponseItem>(ResponseItem.class, ResponseItemConverter.class) {
+        return input.convert(new TypeConvertingVisitor<ResponseItem>(ResponseItem.class, ResponseItemAttributeConverter.class) {
             @Override
             public ResponseItem convertMap(Map<String, ItemAttributeValue> value) {
                 Map<String, ConvertableItemAttributeValue> attributes = new LinkedHashMap<>();

@@ -18,8 +18,8 @@ package software.amazon.awssdk.enhanced.dynamodb.internal.converter;
 import software.amazon.awssdk.annotations.SdkInternalApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionCondition;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.InstanceOfConverter;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.bundled.DefaultConverterChain;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.InstanceOfAttributeConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.DefaultConverterChain;
 import software.amazon.awssdk.utils.Validate;
 
 /**
@@ -27,7 +27,7 @@ import software.amazon.awssdk.utils.Validate;
  * {@link DefaultConverterChain} casts this to a concrete type to invoke it.
  *
  * <p>
- * {@link InstanceOfConverter} simplifies the process of implementing converters of this type.
+ * {@link InstanceOfAttributeConverter} simplifies the process of implementing converters of this type.
  */
 @SdkInternalApi
 @ThreadSafe

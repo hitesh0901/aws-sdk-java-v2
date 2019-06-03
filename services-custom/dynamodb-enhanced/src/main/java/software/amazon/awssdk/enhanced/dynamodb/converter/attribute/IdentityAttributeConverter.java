@@ -13,13 +13,11 @@
  * permissions and limitations under the License.
  */
 
-package software.amazon.awssdk.enhanced.dynamodb.converter.attribute.bundled;
+package software.amazon.awssdk.enhanced.dynamodb.converter.attribute;
 
 import software.amazon.awssdk.annotations.Immutable;
 import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionContext;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ExactInstanceOfConverter;
 import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 
@@ -29,13 +27,13 @@ import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 @SdkPublicApi
 @ThreadSafe
 @Immutable
-public final class IdentityConverter extends ExactInstanceOfConverter<ItemAttributeValue> {
-    private IdentityConverter() {
+public final class IdentityAttributeConverter extends ExactInstanceOfAttributeConverter<ItemAttributeValue> {
+    private IdentityAttributeConverter() {
         super(ItemAttributeValue.class);
     }
 
-    public static IdentityConverter create() {
-        return new IdentityConverter();
+    public static IdentityAttributeConverter create() {
+        return new IdentityAttributeConverter();
     }
 
     @Override

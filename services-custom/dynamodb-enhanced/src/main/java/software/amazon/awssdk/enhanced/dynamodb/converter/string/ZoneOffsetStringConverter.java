@@ -15,10 +15,18 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
-public interface StringConverter<T> {
-    default String toString(T object) {
-        return object.toString();
+import java.time.Period;
+import java.time.ZoneOffset;
+
+public class ZoneOffsetStringConverter implements StringConverter<ZoneOffset> {
+    private ZoneOffsetStringConverter() { }
+
+    public static ZoneOffsetStringConverter create() {
+        return new ZoneOffsetStringConverter();
     }
 
-    T fromString(String string);
+    @Override
+    public ZoneOffset fromString(String string) {
+        return ZoneOffset.of(string);
+    }
 }

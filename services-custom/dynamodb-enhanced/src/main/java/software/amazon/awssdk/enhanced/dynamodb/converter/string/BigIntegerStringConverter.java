@@ -15,10 +15,17 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
-public interface StringConverter<T> {
-    default String toString(T object) {
-        return object.toString();
+import java.math.BigInteger;
+
+public class BigIntegerStringConverter implements StringConverter<BigInteger> {
+    private BigIntegerStringConverter() { }
+
+    public static BigIntegerStringConverter create() {
+        return new BigIntegerStringConverter();
     }
 
-    T fromString(String string);
+    @Override
+    public BigInteger fromString(String string) {
+        return new BigInteger(string);
+    }
 }

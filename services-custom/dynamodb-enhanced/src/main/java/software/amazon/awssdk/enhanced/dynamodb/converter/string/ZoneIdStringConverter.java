@@ -15,10 +15,17 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
-public interface StringConverter<T> {
-    default String toString(T object) {
-        return object.toString();
+import java.time.ZoneId;
+
+public class ZoneIdStringConverter implements StringConverter<ZoneId> {
+    private ZoneIdStringConverter() { }
+
+    public static ZoneIdStringConverter create() {
+        return new ZoneIdStringConverter();
     }
 
-    T fromString(String string);
+    @Override
+    public ZoneId fromString(String string) {
+        return ZoneId.of(string);
+    }
 }

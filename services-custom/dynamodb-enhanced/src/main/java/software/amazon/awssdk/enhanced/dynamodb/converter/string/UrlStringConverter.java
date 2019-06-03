@@ -15,10 +15,22 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
-public interface StringConverter<T> {
-    default String toString(T object) {
-        return object.toString();
+import java.net.MalformedURLException;
+import java.net.URL;
+
+public class UrlStringConverter implements StringConverter<URL> {
+    private UrlStringConverter() { }
+
+    public static UrlStringConverter create() {
+        return new UrlStringConverter();
     }
 
-    T fromString(String string);
+    @Override
+    public URL fromString(String string) {
+        try {
+            return new URL(string);
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("URL format was incorrect: " + string, e);
+        }
+    }
 }

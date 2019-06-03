@@ -15,19 +15,24 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
-public class BooleanStringConverter implements StringConverter<Boolean> {
-    private BooleanStringConverter() { }
+import java.util.concurrent.atomic.AtomicBoolean;
 
-    public static BooleanStringConverter create() {
-        return new BooleanStringConverter();
+public class AtomicBooleanStringConverter implements StringConverter<AtomicBoolean> {
+    private static BooleanStringConverter BOOLEAN_CONVERTER = BooleanStringConverter.create();
+
+    private AtomicBooleanStringConverter() { }
+
+    public static AtomicBooleanStringConverter create() {
+        return new AtomicBooleanStringConverter();
     }
 
     @Override
-    public Boolean fromString(String string) {
-        switch (string) {
-            case "true": return true;
-            case "false": return false;
-            default: throw new IllegalArgumentException("Boolean string was not 'true' or 'false': " + string);
-        }
+    public String toString(AtomicBoolean object) {
+        return BOOLEAN_CONVERTER.toString(object.get());
+    }
+
+    @Override
+    public AtomicBoolean fromString(String string) {
+        return new AtomicBoolean(BOOLEAN_CONVERTER.fromString(string));
     }
 }

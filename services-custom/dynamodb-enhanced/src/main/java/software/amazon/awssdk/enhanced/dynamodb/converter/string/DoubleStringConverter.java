@@ -15,10 +15,15 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
-public interface StringConverter<T> {
-    default String toString(T object) {
-        return object.toString();
+public class DoubleStringConverter implements StringConverter<Double> {
+    private DoubleStringConverter() { }
+
+    public static DoubleStringConverter create() {
+        return new DoubleStringConverter();
     }
 
-    T fromString(String string);
+    @Override
+    public Double fromString(String string) {
+        return Double.valueOf(string);
+    }
 }

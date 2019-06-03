@@ -20,9 +20,6 @@ import java.util.function.Consumer;
 import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.bundled.DefaultConverterChain;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.bundled.InstantConverter;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.bundled.StringAttributeConverter;
 import software.amazon.awssdk.enhanced.dynamodb.model.ConvertableItemAttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.GeneratedResponseItem;
 import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;
@@ -36,8 +33,8 @@ import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
  * <p>
  * Examples:
  * <ul>
- *     <li>The {@link StringAttributeConverter} converts a {@link String} into a DynamoDB string ({@link AttributeValue#s()}).</li>
- *     <li>The {@link InstantConverter} converts an {@link Instant} into a DynamoDB number ({@link AttributeValue#n()}).</li>
+ *     <li>The {@link StringAttributeAttributeConverter} converts a {@link String} into a DynamoDB string ({@link AttributeValue#s()}).</li>
+ *     <li>The {@link InstantAttributeConverter} converts an {@link Instant} into a DynamoDB number ({@link AttributeValue#n()}).</li>
  * </ul>
  *
  * <p>

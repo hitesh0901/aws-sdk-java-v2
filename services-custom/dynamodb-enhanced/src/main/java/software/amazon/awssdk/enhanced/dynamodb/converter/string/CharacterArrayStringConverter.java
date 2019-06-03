@@ -15,10 +15,20 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
-public interface StringConverter<T> {
-    default String toString(T object) {
-        return object.toString();
+public class CharacterArrayStringConverter implements StringConverter<char[]> {
+    private CharacterArrayStringConverter() { }
+
+    public static CharacterArrayStringConverter create() {
+        return new CharacterArrayStringConverter();
     }
 
-    T fromString(String string);
+    @Override
+    public String toString(char[] object) {
+        return new String(object);
+    }
+
+    @Override
+    public char[] fromString(String string) {
+        return string.toCharArray();
+    }
 }

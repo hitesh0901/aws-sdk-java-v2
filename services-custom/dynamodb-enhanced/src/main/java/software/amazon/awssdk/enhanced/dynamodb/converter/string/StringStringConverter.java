@@ -15,10 +15,20 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
-public interface StringConverter<T> {
-    default String toString(T object) {
-        return object.toString();
+public class StringStringConverter implements StringConverter<String> {
+    private StringStringConverter() { }
+
+    public static StringStringConverter create() {
+        return new StringStringConverter();
     }
 
-    T fromString(String string);
+    @Override
+    public String toString(String object) {
+        return object;
+    }
+
+    @Override
+    public String fromString(String string) {
+        return string;
+    }
 }

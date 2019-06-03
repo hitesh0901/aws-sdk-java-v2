@@ -15,25 +15,17 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
-import java.util.function.Function;
+import java.time.Instant;
 
-public class SimpleStringConverter<T> implements StringConverter<T> {
-    private final Function<? super T, String> toString;
-    private final Function<String, ? extends T> fromString;
+public class InstantStringConverter implements StringConverter<Instant> {
+    private InstantStringConverter() { }
 
-    public SimpleStringConverter(Function<? super T, String> toString,
-                                 Function<String, ? extends T> fromString) {
-        this.toString = toString;
-        this.fromString = fromString;
+    public static InstantStringConverter create() {
+        return new InstantStringConverter();
     }
 
     @Override
-    public String toString(T object) {
-        return toString.apply(object);
-    }
-
-    @Override
-    public T fromString(String string) {
-        return fromString.apply(string);
+    public Instant fromString(String string) {
+        return Instant.parse(string);
     }
 }

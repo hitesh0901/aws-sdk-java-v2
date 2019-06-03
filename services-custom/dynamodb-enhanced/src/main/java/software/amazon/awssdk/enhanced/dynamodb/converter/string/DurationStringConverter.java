@@ -15,10 +15,18 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
-public interface StringConverter<T> {
-    default String toString(T object) {
-        return object.toString();
+import java.time.Duration;
+import java.time.Instant;
+
+public class DurationStringConverter implements StringConverter<Duration> {
+    private DurationStringConverter() { }
+
+    public static DurationStringConverter create() {
+        return new DurationStringConverter();
     }
 
-    T fromString(String string);
+    @Override
+    public Duration fromString(String string) {
+        return Duration.parse(string);
+    }
 }

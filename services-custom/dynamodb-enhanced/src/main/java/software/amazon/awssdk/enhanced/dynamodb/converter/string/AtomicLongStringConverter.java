@@ -15,10 +15,24 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
-public interface StringConverter<T> {
-    default String toString(T object) {
-        return object.toString();
+import java.util.concurrent.atomic.AtomicLong;
+
+public class AtomicLongStringConverter implements StringConverter<AtomicLong> {
+    private static LongStringConverter LONG_CONVERTER = LongStringConverter.create();
+
+    private AtomicLongStringConverter() { }
+
+    public static AtomicLongStringConverter create() {
+        return new AtomicLongStringConverter();
     }
 
-    T fromString(String string);
+    @Override
+    public String toString(AtomicLong object) {
+        return LONG_CONVERTER.toString(object.get());
+    }
+
+    @Override
+    public AtomicLong fromString(String string) {
+        return new AtomicLong(LONG_CONVERTER.fromString(string));
+    }
 }

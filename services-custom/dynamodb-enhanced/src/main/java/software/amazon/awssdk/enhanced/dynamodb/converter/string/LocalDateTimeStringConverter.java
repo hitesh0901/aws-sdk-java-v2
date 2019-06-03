@@ -15,10 +15,17 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
-public interface StringConverter<T> {
-    default String toString(T object) {
-        return object.toString();
+import java.time.LocalDateTime;
+
+public class LocalDateTimeStringConverter implements StringConverter<LocalDateTime> {
+    private LocalDateTimeStringConverter() { }
+
+    public static LocalDateTimeStringConverter create() {
+        return new LocalDateTimeStringConverter();
     }
 
-    T fromString(String string);
+    @Override
+    public LocalDateTime fromString(String string) {
+        return LocalDateTime.parse(string);
+    }
 }

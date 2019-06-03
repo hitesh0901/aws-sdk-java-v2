@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-package software.amazon.awssdk.enhanced.dynamodb.converter.attribute.bundled;
+package software.amazon.awssdk.enhanced.dynamodb.converter.attribute;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashMap;
@@ -23,8 +23,6 @@ import java.util.function.Function;
 import software.amazon.awssdk.annotations.Immutable;
 import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionContext;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.InstanceOfConverter;
 import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeConvertingVisitor;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
@@ -36,20 +34,20 @@ import software.amazon.awssdk.utils.Validate;
 @SdkPublicApi
 @ThreadSafe
 @Immutable
-public final class DynamicMapConverter extends InstanceOfConverter<Map<?, ?>> {
+public final class DynamicMapAttributeConverter extends InstanceOfAttributeConverter<Map<?, ?>> {
     private final Function<Object, String> keyToStringConverter;
 
-    private DynamicMapConverter() {
+    private DynamicMapAttributeConverter() {
         this(Object::toString);
     }
 
-    private DynamicMapConverter(Function<Object, String> keyToStringConverter) {
+    private DynamicMapAttributeConverter(Function<Object, String> keyToStringConverter) {
         super(Map.class);
         this.keyToStringConverter = keyToStringConverter;
     }
 
-    public static DynamicMapConverter create() {
-        return new DynamicMapConverter();
+    public static DynamicMapAttributeConverter create() {
+        return new DynamicMapAttributeConverter();
     }
 
     @Override
@@ -70,7 +68,7 @@ public final class DynamicMapConverter extends InstanceOfConverter<Map<?, ?>> {
         TypeToken<?> keyType = mapTypeParameters.get(0);
         TypeToken<?> valueType = mapTypeParameters.get(1);
 
-        return input.convert(new TypeConvertingVisitor<Map<?, ?>>(Map.class, DynamicMapConverter.class) {
+        return input.convert(new TypeConvertingVisitor<Map<?, ?>>(Map.class, DynamicMapAttributeConverter.class) {
             @Override
             public Map<?, ?> convertMap(Map<String, ItemAttributeValue> value) {
                 Map<Object, Object> result = createMap(mapType);

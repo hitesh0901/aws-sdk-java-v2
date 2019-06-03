@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-package software.amazon.awssdk.enhanced.dynamodb.converter.attribute.bundled;
+package software.amazon.awssdk.enhanced.dynamodb.converter.attribute;
 
 import static java.util.stream.Collectors.toList;
 
@@ -27,8 +27,6 @@ import software.amazon.awssdk.annotations.Immutable;
 import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.core.SdkBytes;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionContext;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ExactInstanceOfConverter;
 import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeConvertingVisitor;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
@@ -40,13 +38,13 @@ import software.amazon.awssdk.utils.BinaryUtils;
 @SdkPublicApi
 @ThreadSafe
 @Immutable
-public final class StringAttributeConverter extends ExactInstanceOfConverter<String> {
-    private StringAttributeConverter() {
+public final class StringAttributeAttributeConverter extends ExactInstanceOfAttributeConverter<String> {
+    private StringAttributeAttributeConverter() {
         super(String.class);
     }
 
-    public static StringAttributeConverter create() {
-        return new StringAttributeConverter();
+    public static StringAttributeAttributeConverter create() {
+        return new StringAttributeAttributeConverter();
     }
 
     @Override
@@ -63,7 +61,7 @@ public final class StringAttributeConverter extends ExactInstanceOfConverter<Str
         private static final Visitor INSTANCE = new Visitor();
 
         private Visitor() {
-            super(String.class, StringAttributeConverter.class);
+            super(String.class, StringAttributeAttributeConverter.class);
         }
 
         @Override

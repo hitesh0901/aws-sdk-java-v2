@@ -15,10 +15,18 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
-public interface StringConverter<T> {
-    default String toString(T object) {
-        return object.toString();
+import software.amazon.awssdk.utils.Validate;
+
+public class CharacterStringConverter implements StringConverter<Character> {
+    private CharacterStringConverter() { }
+
+    public static CharacterStringConverter create() {
+        return new CharacterStringConverter();
     }
 
-    T fromString(String string);
+    @Override
+    public Character fromString(String string) {
+        Validate.isTrue(string.length() == 1, "Character string was not of length 1: %s", string);
+        return string.charAt(0);
+    }
 }

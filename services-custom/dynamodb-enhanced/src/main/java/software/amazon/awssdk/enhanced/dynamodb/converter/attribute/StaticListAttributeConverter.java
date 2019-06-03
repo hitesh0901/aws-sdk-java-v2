@@ -13,32 +13,28 @@
  * permissions and limitations under the License.
  */
 
-package software.amazon.awssdk.enhanced.dynamodb.converter.attribute.bundled;
+package software.amazon.awssdk.enhanced.dynamodb.converter.attribute;
 
 import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
 import java.util.List;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionContext;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ExactInstanceOfConverter;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ItemAttributeValueConverter;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.InstanceOfConverter;
 import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeConvertingVisitor;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 
-public class StaticListConverter extends InstanceOfConverter<List<?>> {
+public class StaticListAttributeConverter extends InstanceOfAttributeConverter<List<?>> {
     private final Class<?> elementType;
     private final ItemAttributeValueConverter elementConverter;
 
-    private StaticListConverter(Class<?> elementType, ItemAttributeValueConverter elementConverter) {
+    private StaticListAttributeConverter(Class<?> elementType, ItemAttributeValueConverter elementConverter) {
         super(List.class);
         this.elementType = elementType;
         this.elementConverter = elementConverter;
     }
 
-    public static StaticListConverter create(ExactInstanceOfConverter<?> elementConverter) {
-        return new StaticListConverter(elementConverter.type(), elementConverter);
+    public static StaticListAttributeConverter create(ExactInstanceOfAttributeConverter<?> elementConverter) {
+        return new StaticListAttributeConverter(elementConverter.type(), elementConverter);
     }
 
     @Override
@@ -50,7 +46,7 @@ public class StaticListConverter extends InstanceOfConverter<List<?>> {
 
     @Override
     protected List<?> convertFromAttributeValue(ItemAttributeValue input, TypeToken<?> desiredType, ConversionContext context) {
-        return input.convert(new TypeConvertingVisitor<List<?>>(List.class, StaticListConverter.class) {
+        return input.convert(new TypeConvertingVisitor<List<?>>(List.class, StaticListAttributeConverter.class) {
             @Override
             public List<?> convertListOfAttributeValues(Collection<ItemAttributeValue> value) {
                 return value.stream()

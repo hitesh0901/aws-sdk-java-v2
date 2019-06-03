@@ -26,35 +26,37 @@ import software.amazon.awssdk.utils.Validate;
 
 /**
  * A base class that simplifies the process of implementing an {@link ItemAttributeValueConverter} with the
- * {@link ConversionCondition#isExactInstanceOf(Class)} conversion type. This handles casting to/from the mapped type and
+ * {@link ConversionCondition#isInstanceOf(Class)} conversion type. This handles casting to/from the mapped type and
  * validates that the converter is being invoked with the correct types.
  */
 @SdkPublicApi
 @ThreadSafe
-public abstract class ExactInstanceOfConverter<T> implements ItemAttributeValueConverter {
+public abstract class InstanceOfAttributeConverter<T> implements ItemAttributeValueConverter {
     private final Class<T> type;
 
-    protected ExactInstanceOfConverter(Class<?> type) {
+    protected InstanceOfAttributeConverter(Class<?> type) {
         this.type = (Class<T>) type;
     }
 
     @Override
-    public ConversionCondition conversionCondition() {
-        return ConversionCondition.isExactInstanceOf(type);
+    public final ConversionCondition conversionCondition() {
+        return ConversionCondition.isInstanceOf(type);
     }
 
     @Override
     public final ItemAttributeValue toAttributeValue(Object input, ConversionContext context) {
-        Validate.isTrue(type.equals(input.getClass()),
-                        "The input %s does not equal %s.", input.getClass(), type);
+        T typedInput = Validate.isInstanceOf(type, input,
+                                             "Input type %s could not be converted to a %s.",
+                                             input.getClass(), type);
 
-        return convertToAttributeValue(type.cast(input), context);
+        return convertToAttributeValue(typedInput, context);
     }
 
     @Override
     public final Object fromAttributeValue(ItemAttributeValue input, TypeToken<?> desiredType, ConversionContext context) {
-        Validate.isTrue(type.equals(desiredType.rawClass()),
-                        "The desired type %s does not equal %s.", desiredType, type);
+        Validate.isAssignableFrom(type, desiredType.rawClass(),
+                                  "Requested type %s is not a subtype of %s.",
+                                  desiredType, type);
 
         return convertFromAttributeValue(input, desiredType, context);
     }
@@ -63,7 +65,10 @@ public abstract class ExactInstanceOfConverter<T> implements ItemAttributeValueC
         return type;
     }
 
-    protected abstract ItemAttributeValue convertToAttributeValue(T input, ConversionContext context);
-    
-    protected abstract T convertFromAttributeValue(ItemAttributeValue input, TypeToken<?> desiredType, ConversionContext context);
+    protected abstract ItemAttributeValue convertToAttributeValue(T input,
+                                                                  ConversionContext conversionContext);
+
+    protected abstract T convertFromAttributeValue(ItemAttributeValue input,
+                                                   TypeToken<?> desiredType,
+                                                   ConversionContext context);
 }

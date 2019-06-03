@@ -13,16 +13,13 @@
  * permissions and limitations under the License.
  */
 
-package software.amazon.awssdk.enhanced.dynamodb.converter.attribute.bundled;
+package software.amazon.awssdk.enhanced.dynamodb.converter.attribute;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import software.amazon.awssdk.annotations.Immutable;
 import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionContext;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ItemAttributeValueConverter;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.InstanceOfConverter;
 import software.amazon.awssdk.enhanced.dynamodb.internal.converter.ItemAttributeValueConverterChain;
 import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.RequestItem;
@@ -34,13 +31,13 @@ import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 @SdkPublicApi
 @ThreadSafe
 @Immutable
-public final class RequestItemConverter extends InstanceOfConverter<RequestItem> {
-    private RequestItemConverter() {
+public final class RequestItemAttributeConverter extends InstanceOfAttributeConverter<RequestItem> {
+    private RequestItemAttributeConverter() {
         super(RequestItem.class);
     }
 
-    public static RequestItemConverter create() {
-        return new RequestItemConverter();
+    public static RequestItemAttributeConverter create() {
+        return new RequestItemAttributeConverter();
     }
 
     @Override

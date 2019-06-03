@@ -15,10 +15,17 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
-public interface StringConverter<T> {
-    default String toString(T object) {
-        return object.toString();
+import java.time.Period;
+
+public class PeriodStringConverter implements StringConverter<Period> {
+    private PeriodStringConverter() { }
+
+    public static PeriodStringConverter create() {
+        return new PeriodStringConverter();
     }
 
-    T fromString(String string);
+    @Override
+    public Period fromString(String string) {
+        return Period.parse(string);
+    }
 }
