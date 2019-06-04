@@ -16,12 +16,18 @@
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
 import java.time.OffsetTime;
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 
 public class OffsetTimeStringConverter implements StringConverter<OffsetTime> {
     private OffsetTimeStringConverter() { }
 
     public static OffsetTimeStringConverter create() {
         return new OffsetTimeStringConverter();
+    }
+
+    @Override
+    public TypeToken<OffsetTime> type() {
+        return TypeToken.from(OffsetTime.class);
     }
 
     @Override

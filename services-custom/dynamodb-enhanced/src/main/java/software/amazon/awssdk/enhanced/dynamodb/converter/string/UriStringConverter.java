@@ -16,12 +16,18 @@
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
 import java.net.URI;
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 
 public class UriStringConverter implements StringConverter<URI> {
     private UriStringConverter() { }
 
     public static UriStringConverter create() {
         return new UriStringConverter();
+    }
+
+    @Override
+    public TypeToken<URI> type() {
+        return TypeToken.from(URI.class);
     }
 
     @Override

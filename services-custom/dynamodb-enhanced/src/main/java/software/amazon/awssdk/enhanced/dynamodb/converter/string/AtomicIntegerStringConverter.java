@@ -16,6 +16,7 @@
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 
 public class AtomicIntegerStringConverter implements StringConverter<AtomicInteger> {
     private static IntegerStringConverter INTEGER_CONVERTER = IntegerStringConverter.create();
@@ -24,6 +25,11 @@ public class AtomicIntegerStringConverter implements StringConverter<AtomicInteg
 
     public static AtomicIntegerStringConverter create() {
         return new AtomicIntegerStringConverter();
+    }
+
+    @Override
+    public TypeToken<AtomicInteger> type() {
+        return TypeToken.from(AtomicInteger.class);
     }
 
     @Override

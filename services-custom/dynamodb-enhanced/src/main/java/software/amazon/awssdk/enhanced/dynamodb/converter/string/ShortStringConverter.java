@@ -15,11 +15,18 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
+
 public class ShortStringConverter implements StringConverter<Short> {
     private ShortStringConverter() { }
 
     public static ShortStringConverter create() {
         return new ShortStringConverter();
+    }
+
+    @Override
+    public TypeToken<Short> type() {
+        return TypeToken.from(Short.class);
     }
 
     @Override

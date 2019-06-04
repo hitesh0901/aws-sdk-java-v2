@@ -15,11 +15,18 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
+
 public class StringBuilderStringConverter implements StringConverter<StringBuilder> {
     private StringBuilderStringConverter() { }
 
     public static StringBuilderStringConverter create() {
         return new StringBuilderStringConverter();
+    }
+
+    @Override
+    public TypeToken<StringBuilder> type() {
+        return TypeToken.from(StringBuilder.class);
     }
 
     @Override

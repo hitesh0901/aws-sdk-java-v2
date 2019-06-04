@@ -16,6 +16,7 @@
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
 import java.util.OptionalInt;
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 
 public class OptionalIntStringConverter implements StringConverter<OptionalInt> {
     private static IntegerStringConverter INTEGER_CONVERTER = IntegerStringConverter.create();
@@ -24,6 +25,11 @@ public class OptionalIntStringConverter implements StringConverter<OptionalInt> 
 
     public static OptionalIntStringConverter create() {
         return new OptionalIntStringConverter();
+    }
+
+    @Override
+    public TypeToken<OptionalInt> type() {
+        return TypeToken.from(OptionalInt.class);
     }
 
     @Override

@@ -15,34 +15,10 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.net.URI;
-import java.net.URL;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.MonthDay;
-import java.time.OffsetDateTime;
-import java.time.OffsetTime;
-import java.time.Period;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.OptionalDouble;
-import java.util.OptionalInt;
-import java.util.OptionalLong;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 
 public class DefaultStringConverter implements SubtypeStringConverter<Object> {
     private final Map<Class<?>, StringConverter<?>> converters;
@@ -67,61 +43,66 @@ public class DefaultStringConverter implements SubtypeStringConverter<Object> {
         putConverter(converters, byte.class, ByteStringConverter.create());
 
         // Primitive Array Types
-        putConverter(converters, byte[].class, ByteArrayStringConverter.create());
-        putConverter(converters, char[].class, CharacterArrayStringConverter.create());
+        putConverter(converters, ByteArrayStringConverter.create());
+        putConverter(converters, CharacterArrayStringConverter.create());
 
         // Boxed Primitive Types
-        putConverter(converters, Boolean.class, BooleanStringConverter.create());
-        putConverter(converters, Short.class, ShortStringConverter.create());
-        putConverter(converters, Integer.class, IntegerStringConverter.create());
-        putConverter(converters, Long.class, LongStringConverter.create());
-        putConverter(converters, Float.class, FloatStringConverter.create());
-        putConverter(converters, Double.class, DoubleStringConverter.create());
-        putConverter(converters, Character.class, CharacterStringConverter.create());
-        putConverter(converters, Byte.class, ByteStringConverter.create());
+        putConverter(converters, BooleanStringConverter.create());
+        putConverter(converters, ShortStringConverter.create());
+        putConverter(converters, IntegerStringConverter.create());
+        putConverter(converters, LongStringConverter.create());
+        putConverter(converters, FloatStringConverter.create());
+        putConverter(converters, DoubleStringConverter.create());
+        putConverter(converters, CharacterStringConverter.create());
+        putConverter(converters, ByteStringConverter.create());
 
         // String Types
-        putConverter(converters, String.class, StringStringConverter.create());
-        putConverter(converters, CharSequence.class, CharSequenceStringConverter.create());
-        putConverter(converters, StringBuffer.class, StringBufferStringConverter.create());
-        putConverter(converters, StringBuilder.class, StringBuilderStringConverter.create());
+        putConverter(converters, StringStringConverter.create());
+        putConverter(converters, CharSequenceStringConverter.create());
+        putConverter(converters, StringBufferStringConverter.create());
+        putConverter(converters, StringBuilderStringConverter.create());
 
         // Number Types
-        putConverter(converters, BigInteger.class, BigIntegerStringConverter.create());
-        putConverter(converters, BigDecimal.class, BigDecimalStringConverter.create());
+        putConverter(converters, BigIntegerStringConverter.create());
+        putConverter(converters, BigDecimalStringConverter.create());
 
         // Atomic Types
-        putConverter(converters, AtomicLong.class, AtomicLongStringConverter.create());
-        putConverter(converters, AtomicInteger.class, AtomicIntegerStringConverter.create());
-        putConverter(converters, AtomicBoolean.class, AtomicBooleanStringConverter.create());
+        putConverter(converters, AtomicLongStringConverter.create());
+        putConverter(converters, AtomicIntegerStringConverter.create());
+        putConverter(converters, AtomicBooleanStringConverter.create());
 
         // Optional Types
-        putConverter(converters, OptionalInt.class, OptionalIntStringConverter.create());
-        putConverter(converters, OptionalLong.class, OptionalLongStringConverter.create());
-        putConverter(converters, OptionalDouble.class, OptionalDoubleStringConverter.create());
+        putConverter(converters, OptionalIntStringConverter.create());
+        putConverter(converters, OptionalLongStringConverter.create());
+        putConverter(converters, OptionalDoubleStringConverter.create());
 
         // Time Types
-        putConverter(converters, Instant.class, InstantStringConverter.create());
-        putConverter(converters, Duration.class, DurationStringConverter.create());
-        putConverter(converters, LocalDate.class, LocalDateStringConverter.create());
-        putConverter(converters, LocalTime.class, LocalTimeStringConverter.create());
-        putConverter(converters, LocalDateTime.class, LocalDateTimeStringConverter.create());
-        putConverter(converters, OffsetTime.class, OffsetTimeStringConverter.create());
-        putConverter(converters, OffsetDateTime.class, OffsetDateTimeStringConverter.create());
-        putConverter(converters, ZonedDateTime.class, ZonedDateTimeStringConverter.create());
-        putConverter(converters, Year.class, YearStringConverter.create());
-        putConverter(converters, YearMonth.class, YearMonthStringConverter.create());
-        putConverter(converters, MonthDay.class, MonthDayStringConverter.create());
-        putConverter(converters, Period.class, PeriodStringConverter.create());
-        putConverter(converters, ZoneOffset.class, ZoneOffsetStringConverter.create());
-        putConverter(converters, ZoneId.class, ZoneIdStringConverter.create());
+        putConverter(converters, InstantStringConverter.create());
+        putConverter(converters, DurationStringConverter.create());
+        putConverter(converters, LocalDateStringConverter.create());
+        putConverter(converters, LocalTimeStringConverter.create());
+        putConverter(converters, LocalDateTimeStringConverter.create());
+        putConverter(converters, OffsetTimeStringConverter.create());
+        putConverter(converters, OffsetDateTimeStringConverter.create());
+        putConverter(converters, ZonedDateTimeStringConverter.create());
+        putConverter(converters, YearStringConverter.create());
+        putConverter(converters, YearMonthStringConverter.create());
+        putConverter(converters, MonthDayStringConverter.create());
+        putConverter(converters, PeriodStringConverter.create());
+        putConverter(converters, ZoneOffsetStringConverter.create());
+        putConverter(converters, ZoneIdStringConverter.create());
 
         // Other
-        putConverter(converters, UUID.class, UuidStringConverter.create());
-        putConverter(converters, URL.class, UrlStringConverter.create());
-        putConverter(converters, URI.class, UriStringConverter.create());
+        putConverter(converters, UuidStringConverter.create());
+        putConverter(converters, UrlStringConverter.create());
+        putConverter(converters, UriStringConverter.create());
 
         this.converters = Collections.unmodifiableMap(converters);
+    }
+
+    @Override
+    public TypeToken<Object> type() {
+        return TypeToken.from(Object.class);
     }
 
     @Override
@@ -134,12 +115,16 @@ public class DefaultStringConverter implements SubtypeStringConverter<Object> {
     }
 
     @Override
-    public <T> T fromString(Class<T> targetType, String input) {
+    public <T> T fromString(TypeToken<T> targetType, String input) {
         if (input == null) {
             return null;
         }
 
-        return convertFromString(targetType, input);
+        return convertFromString(targetType.rawClass(), input);
+    }
+
+    private <T> void putConverter(Map<Class<?>, StringConverter<?>> converters, StringConverter<T> converter) {
+        converters.put(converter.type().rawClass(), converter);
     }
 
     private <T> void putConverter(Map<Class<?>, StringConverter<?>> converters, Class<T> type, StringConverter<T> converter) {

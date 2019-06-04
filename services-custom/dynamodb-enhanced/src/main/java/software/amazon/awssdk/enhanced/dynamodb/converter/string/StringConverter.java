@@ -15,7 +15,9 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
-public interface StringConverter<T> {
+import software.amazon.awssdk.enhanced.dynamodb.converter.Converter;
+
+public interface StringConverter<T> extends Converter<T> {
     default String toString(T object) {
         return object.toString();
     }

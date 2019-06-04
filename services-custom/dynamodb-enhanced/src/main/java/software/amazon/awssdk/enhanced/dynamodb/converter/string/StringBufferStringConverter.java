@@ -15,11 +15,18 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
+
 public class StringBufferStringConverter implements StringConverter<StringBuffer> {
     private StringBufferStringConverter() { }
 
     public static StringBufferStringConverter create() {
         return new StringBufferStringConverter();
+    }
+
+    @Override
+    public TypeToken<StringBuffer> type() {
+        return TypeToken.from(StringBuffer.class);
     }
 
     @Override

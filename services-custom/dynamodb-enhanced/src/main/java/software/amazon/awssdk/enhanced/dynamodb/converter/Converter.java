@@ -13,25 +13,10 @@
  * permissions and limitations under the License.
  */
 
-package software.amazon.awssdk.enhanced.dynamodb.converter.string;
+package software.amazon.awssdk.enhanced.dynamodb.converter;
 
-import java.time.ZoneOffset;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 
-public class ZoneOffsetStringConverter implements StringConverter<ZoneOffset> {
-    private ZoneOffsetStringConverter() { }
-
-    public static ZoneOffsetStringConverter create() {
-        return new ZoneOffsetStringConverter();
-    }
-
-    @Override
-    public TypeToken<ZoneOffset> type() {
-        return TypeToken.from(ZoneOffset.class);
-    }
-
-    @Override
-    public ZoneOffset fromString(String string) {
-        return ZoneOffset.of(string);
-    }
+public interface Converter<T> {
+    TypeToken<T> type();
 }

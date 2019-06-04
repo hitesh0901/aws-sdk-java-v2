@@ -19,10 +19,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import software.amazon.awssdk.annotations.Immutable;
 import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
+import software.amazon.awssdk.enhanced.dynamodb.converter.string.DefaultStringConverter;
 import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeConvertingVisitor;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
@@ -34,32 +34,30 @@ import software.amazon.awssdk.utils.Validate;
 @SdkPublicApi
 @ThreadSafe
 @Immutable
-public final class DynamicMapAttributeConverter extends InstanceOfAttributeConverter<Map<?, ?>> {
-    private final Function<Object, String> keyToStringConverter;
-
-    private DynamicMapAttributeConverter() {
-        this(Object::toString);
-    }
-
-    private DynamicMapAttributeConverter(Function<Object, String> keyToStringConverter) {
-        super(Map.class);
-        this.keyToStringConverter = keyToStringConverter;
-    }
+public final class DynamicMapAttributeConverter implements SubtypeAttributeConverter<Map<?, ?>> {
+    private static final TypeToken<Map<?, ?>> TYPE = new TypeToken<Map<?, ?>>() {};
 
     public static DynamicMapAttributeConverter create() {
         return new DynamicMapAttributeConverter();
     }
 
     @Override
-    protected ItemAttributeValue convertToAttributeValue(Map<?, ?> input, ConversionContext context) {
+    public TypeToken<Map<?, ?>> type() {
+        return TYPE;
+    }
+
+    @Override
+    public ItemAttributeValue toAttributeValue(Map<?, ?> input, ConversionContext context) {
         Map<String, ItemAttributeValue> result = new LinkedHashMap<>();
-        input.forEach((key, value) -> result.put(keyToStringConverter.apply(key),
+        input.forEach((key, value) -> result.put(DefaultStringConverter.instance().toString(key),
                                                  context.converter().toAttributeValue(value, context)));
         return ItemAttributeValue.fromMap(result);
     }
 
     @Override
-    protected Map<?, ?> convertFromAttributeValue(ItemAttributeValue input, TypeToken<?> desiredType, ConversionContext context) {
+    public <T extends Map<?, ?>> T fromAttributeValue(ItemAttributeValue input,
+                                                      TypeToken<T> desiredType,
+                                                      ConversionContext context) {
         Class<?> mapType = desiredType.rawClass();
         List<TypeToken<?>> mapTypeParameters = desiredType.rawClassParameters();
 
@@ -68,15 +66,16 @@ public final class DynamicMapAttributeConverter extends InstanceOfAttributeConve
         TypeToken<?> keyType = mapTypeParameters.get(0);
         TypeToken<?> valueType = mapTypeParameters.get(1);
 
-        return input.convert(new TypeConvertingVisitor<Map<?, ?>>(Map.class, DynamicMapAttributeConverter.class) {
+        return input.convert(new TypeConvertingVisitor<T>(Map.class, DynamicMapAttributeConverter.class) {
             @Override
-            public Map<?, ?> convertMap(Map<String, ItemAttributeValue> value) {
+            public T convertMap(Map<String, ItemAttributeValue> value) {
                 Map<Object, Object> result = createMap(mapType);
                 value.forEach((k, v) -> {
-                    result.put(context.converter().fromAttributeValue(ItemAttributeValue.fromString(k), keyType, context),
+                    result.put(DefaultStringConverter.instance().fromString(keyType, k),
                                context.converter().fromAttributeValue(v, valueType, context));
                 });
-                return result;
+                // This is a safe cast - We know the values we added to the map match the type that the customer requested.
+                return (T) result;
             }
         });
     }

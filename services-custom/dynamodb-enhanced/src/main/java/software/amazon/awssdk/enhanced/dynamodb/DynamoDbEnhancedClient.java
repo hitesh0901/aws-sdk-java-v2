@@ -22,8 +22,7 @@ import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.core.internal.http.loader.DefaultSdkHttpClientBuilder;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ItemAttributeValueConverter;
-import software.amazon.awssdk.enhanced.dynamodb.converter.item.ItemConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.AttributeConverter;
 import software.amazon.awssdk.enhanced.dynamodb.internal.DefaultDynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.model.ConverterAware;
 import software.amazon.awssdk.regions.providers.DefaultAwsRegionProviderChain;
@@ -219,10 +218,10 @@ public interface DynamoDbEnhancedClient extends ToCopyableBuilder<DynamoDbEnhanc
         Builder dynamoDbClient(DynamoDbClient client);
 
         @Override
-        Builder addConverters(Collection<? extends ItemAttributeValueConverter> converters);
+        Builder addConverters(Collection<? extends AttributeConverter> converters);
 
         @Override
-        Builder addConverter(ItemAttributeValueConverter converter);
+        Builder addConverter(AttributeConverter converter);
 
         @Override
         Builder clearConverters();

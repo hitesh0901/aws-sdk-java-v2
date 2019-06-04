@@ -15,6 +15,7 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 import software.amazon.awssdk.utils.Validate;
 
 public class CharacterStringConverter implements StringConverter<Character> {
@@ -22,6 +23,11 @@ public class CharacterStringConverter implements StringConverter<Character> {
 
     public static CharacterStringConverter create() {
         return new CharacterStringConverter();
+    }
+
+    @Override
+    public TypeToken<Character> type() {
+        return TypeToken.from(Character.class);
     }
 
     @Override

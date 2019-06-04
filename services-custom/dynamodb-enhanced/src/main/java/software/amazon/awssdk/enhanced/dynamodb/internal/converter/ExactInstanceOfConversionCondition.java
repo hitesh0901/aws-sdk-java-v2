@@ -17,14 +17,12 @@ package software.amazon.awssdk.enhanced.dynamodb.internal.converter;
 
 import software.amazon.awssdk.annotations.SdkInternalApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionCondition;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ExactInstanceOfAttributeConverter;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.DefaultConverterChain;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.DefaultAttributeConverter;
 import software.amazon.awssdk.utils.Validate;
 
 /**
  * This is created by {@link ConversionCondition#isExactInstanceOf(Class)}. The parent is just a marker interface, so
- * {@link DefaultConverterChain} casts this to a concrete type to invoke it.
+ * {@link DefaultAttributeConverter} casts this to a concrete type to invoke it.
  *
  * <p>
  * {@link ExactInstanceOfAttributeConverter} simplifies the process of implementing converters of this type.

@@ -20,7 +20,7 @@ import java.util.Map;
 import software.amazon.awssdk.annotations.Immutable;
 import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ItemAttributeValueConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.AttributeConverter;
 import software.amazon.awssdk.enhanced.dynamodb.internal.model.DefaultGeneratedResponseItem;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.utils.builder.CopyableBuilder;
@@ -50,7 +50,7 @@ public interface GeneratedResponseItem extends AttributeAware<AttributeValue>,
      *
      * <p>
      * This will not use the default converter chain or any converters associated with the client unless they were explicitly
-     * added via {@link Builder#addConverter(ItemAttributeValueConverter)} (or similar methods).
+     * added via {@link Builder#addConverter(AttributeConverter)} (or similar methods).
      *
      * <p>
      * Reasons this call may fail with a {@link RuntimeException}:
@@ -79,10 +79,10 @@ public interface GeneratedResponseItem extends AttributeAware<AttributeValue>,
         Builder clearAttributes();
 
         @Override
-        Builder addConverters(Collection<? extends ItemAttributeValueConverter> converters);
+        Builder addConverters(Collection<? extends AttributeConverter> converters);
 
         @Override
-        Builder addConverter(ItemAttributeValueConverter converter);
+        Builder addConverter(AttributeConverter converter);
 
         @Override
         Builder clearConverters();

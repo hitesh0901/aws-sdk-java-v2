@@ -21,9 +21,9 @@ import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.MappedTable;
 import software.amazon.awssdk.enhanced.dynamodb.Table;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ItemAttributeValueConverter;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.DefaultConverterChain;
-import software.amazon.awssdk.enhanced.dynamodb.internal.converter.ItemAttributeValueConverterChain;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.AttributeConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.DefaultAttributeConverter;
+import software.amazon.awssdk.enhanced.dynamodb.internal.converter.AttributeConverterChain;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.utils.Validate;
 
@@ -35,7 +35,7 @@ import software.amazon.awssdk.utils.Validate;
 public class DefaultDynamoDbEnhancedClient implements DynamoDbEnhancedClient {
     private boolean shouldCloseUnderlyingClient;
     private final DynamoDbClient client;
-    private final ItemAttributeValueConverterChain converter;
+    private final AttributeConverterChain converter;
 
     private DefaultDynamoDbEnhancedClient(Builder builder) {
         if (builder.client == null) {
@@ -84,9 +84,9 @@ public class DefaultDynamoDbEnhancedClient implements DynamoDbEnhancedClient {
     }
 
     public static class Builder implements DynamoDbEnhancedClient.Builder {
-        private ItemAttributeValueConverterChain.Builder converterChain =
-                ItemAttributeValueConverterChain.builder()
-                                                .parent(DefaultConverterChain.create());
+        private AttributeConverterChain.Builder converterChain =
+                AttributeConverterChain.builder()
+                                       .parent(DefaultAttributeConverter.create());
         private DynamoDbClient client;
 
         private Builder() {}
@@ -98,7 +98,7 @@ public class DefaultDynamoDbEnhancedClient implements DynamoDbEnhancedClient {
         }
 
         @Override
-        public Builder addConverters(Collection<? extends ItemAttributeValueConverter> converters) {
+        public Builder addConverters(Collection<? extends AttributeConverter> converters) {
             Validate.paramNotNull(converters, "converters");
             Validate.noNullElements(converters, "Converters must not contain null members.");
             converterChain.addConverters(converters);
@@ -106,7 +106,7 @@ public class DefaultDynamoDbEnhancedClient implements DynamoDbEnhancedClient {
         }
 
         @Override
-        public Builder addConverter(ItemAttributeValueConverter converter) {
+        public Builder addConverter(AttributeConverter converter) {
             Validate.paramNotNull(converter, "converter");
             converterChain.addConverter(converter);
             return this;

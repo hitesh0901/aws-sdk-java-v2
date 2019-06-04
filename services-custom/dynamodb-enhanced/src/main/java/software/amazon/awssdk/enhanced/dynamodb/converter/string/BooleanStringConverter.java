@@ -15,11 +15,18 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
+
 public class BooleanStringConverter implements StringConverter<Boolean> {
     private BooleanStringConverter() { }
 
     public static BooleanStringConverter create() {
         return new BooleanStringConverter();
+    }
+
+    @Override
+    public TypeToken<Boolean> type() {
+        return TypeToken.from(Boolean.class);
     }
 
     @Override

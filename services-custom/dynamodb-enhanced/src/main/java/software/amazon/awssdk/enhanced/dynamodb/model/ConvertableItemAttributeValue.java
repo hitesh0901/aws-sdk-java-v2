@@ -22,7 +22,7 @@ import software.amazon.awssdk.annotations.Immutable;
 import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.enhanced.dynamodb.Table;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ItemAttributeValueConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.AttributeConverter;
 import software.amazon.awssdk.utils.Validate;
 
 /**
@@ -56,7 +56,7 @@ public interface ConvertableItemAttributeValue {
     ItemAttributeValue attributeValue();
 
     /**
-     * Convert this attribute value into the provided type, using the {@link ItemAttributeValueConverter}s configured in the SDK.
+     * Convert this attribute value into the provided type, using the {@link AttributeConverter}s configured in the SDK.
      *
      * <p>
      * For parameterized types, use {@link #as(TypeToken)}.
@@ -93,7 +93,7 @@ public interface ConvertableItemAttributeValue {
     <T> T as(TypeToken<T> type);
 
     /**
-     * Convert this attribute value into a {@link String} using the {@link ItemAttributeValueConverter}s configured in the SDK.
+     * Convert this attribute value into a {@link String} using the {@link AttributeConverter}s configured in the SDK.
      *
      * <p>
      * Reasons this call may fail with a {@link RuntimeException}:
@@ -106,7 +106,7 @@ public interface ConvertableItemAttributeValue {
     }
 
     /**
-     * Convert this attribute value into an {@link Integer} using the {@link ItemAttributeValueConverter}s configured in the SDK.
+     * Convert this attribute value into an {@link Integer} using the {@link AttributeConverter}s configured in the SDK.
      *
      * <p>
      * Reasons this call may fail with a {@link RuntimeException}:
@@ -119,7 +119,7 @@ public interface ConvertableItemAttributeValue {
     }
 
     /**
-     * Convert this attribute value into an {@link Integer} using the {@link ItemAttributeValueConverter}s configured in the SDK.
+     * Convert this attribute value into an {@link Integer} using the {@link AttributeConverter}s configured in the SDK.
      *
      * <p>
      * Reasons this call may fail with a {@link RuntimeException}:
@@ -133,7 +133,7 @@ public interface ConvertableItemAttributeValue {
 
     /**
      * Convert this attribute value into a {@link List}, parameterized with the provided class. This uses the
-     * {@link ItemAttributeValueConverter}s configured in the SDK.
+     * {@link AttributeConverter}s configured in the SDK.
      *
      * <p>
      * Reasons this call may fail with a {@link RuntimeException}:
@@ -149,7 +149,7 @@ public interface ConvertableItemAttributeValue {
 
     /**
      * Convert this attribute value into a {@link Map}, parameterized with the provided classes. This uses the
-     * {@link ItemAttributeValueConverter}s configured in the SDK.
+     * {@link AttributeConverter}s configured in the SDK.
      *
      * <p>
      * Reasons this call may fail with a {@link RuntimeException}:

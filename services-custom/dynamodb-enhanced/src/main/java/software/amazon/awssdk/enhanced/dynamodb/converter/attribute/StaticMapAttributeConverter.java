@@ -16,64 +16,48 @@
 package software.amazon.awssdk.enhanced.dynamodb.converter.attribute;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import software.amazon.awssdk.enhanced.dynamodb.converter.string.StringConverter;
 import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeConvertingVisitor;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 
-public class StaticMapAttributeConverter extends InstanceOfAttributeConverter<Map<?, ?>> {
-    private final Class<?> valueType;
-    private final StringConverter<?> keyConverter;
-    private final ExactInstanceOfAttributeConverter<?> valueConverter;
+public class StaticMapAttributeConverter<K, V> implements AttributeConverter<Map<K, V>> {
+    private final StringConverter<K> keyConverter;
+    private final AttributeConverter<V> valueConverter;
 
-    private StaticMapAttributeConverter(StringConverter<?> keyConverter,
-                                        ExactInstanceOfAttributeConverter<?> valueConverter) {
-        super(List.class);
+    private StaticMapAttributeConverter(StringConverter<K> keyConverter,
+                                        AttributeConverter<V> valueConverter) {
         this.keyConverter = keyConverter;
-        this.valueType = valueConverter.type();
         this.valueConverter = valueConverter;
     }
 
-    public static StaticMapAttributeConverter create(StringConverter<?> keyConverter,
-                                                     ExactInstanceOfAttributeConverter<?> valueConverter) {
-        return new StaticMapAttributeConverter(keyConverter, valueConverter);
+    public static <K, V> StaticMapAttributeConverter<K, V> create(StringConverter<K> keyConverter,
+                                                                  AttributeConverter<V> valueConverter) {
+        return new StaticMapAttributeConverter<>(keyConverter, valueConverter);
     }
 
     @Override
-    protected ItemAttributeValue convertToAttributeValue(Map<?, ?> input, ConversionContext context) {
+    public TypeToken<Map<K, V>> type() {
+        return TypeToken.mapOf(keyConverter.type(), valueConverter.type());
+    }
+
+    @Override
+    public ItemAttributeValue toAttributeValue(Map<K, V> input, ConversionContext context) {
         Map<String, ItemAttributeValue> result = new LinkedHashMap<>();
-        input.forEach((k, v) -> {
-            result.put(keyConverter.fromString(k),
-                       valueConverter.toAttributeValue(v, ctx -> ctx.attributeName(context.attributeName().orElse(null))
-                                                                    .converter(valueConverter)));
-        });
+        input.forEach((k, v) -> result.put(keyConverter.toString(k), valueConverter.toAttributeValue(v, context)));
         return ItemAttributeValue.fromMap(result);
     }
 
     @Override
-    protected Map<?, ?> convertFromAttributeValue(ItemAttributeValue input, TypeToken<?> desiredType, ConversionContext context) {
-        return input.convert(new TypeConvertingVisitor<Map<?, ?>>(Map.class, StaticMapAttributeConverter.class) {
+    public Map<K, V> fromAttributeValue(ItemAttributeValue input, ConversionContext context) {
+        return input.convert(new TypeConvertingVisitor<Map<K, V>>(Map.class, StaticMapAttributeConverter.class) {
             @Override
-            public Map<?, ?> convertMap(Map<String, ItemAttributeValue> value) {
-                Map<Object, Object> result = new LinkedHashMap<>();
-                result.put()
-                return super.convertMap(value);
+            public Map<K, V> convertMap(Map<String, ItemAttributeValue> value) {
+                Map<K, V> result = new LinkedHashMap<>();
+                value.forEach((k, v) -> result.put(keyConverter.fromString(k), valueConverter.fromAttributeValue(v, context)));
+                return result;
             }
         });
-    }
-
-    private ItemAttributeValue elementToAttributeValue(Object element, ConversionContext conversionContext) {
-        return valueConverter.toAttributeValue(element, c -> c.attributeName(conversionContext.attributeName().orElse(null))
-                                                              .converter(valueConverter));
-    }
-
-    private Object elementFromAttributeValue(ItemAttributeValue attribute, ConversionContext context) {
-        return valueConverter.fromAttributeValue(
-                attribute,
-                TypeToken.from(valueType),
-                ctx -> ctx.attributeName(context.attributeName().orElse(null))
-                          .converter(valueConverter));
     }
 }

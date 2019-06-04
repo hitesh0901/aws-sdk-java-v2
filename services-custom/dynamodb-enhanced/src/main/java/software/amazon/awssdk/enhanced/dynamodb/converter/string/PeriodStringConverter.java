@@ -16,12 +16,18 @@
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
 import java.time.Period;
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 
 public class PeriodStringConverter implements StringConverter<Period> {
     private PeriodStringConverter() { }
 
     public static PeriodStringConverter create() {
         return new PeriodStringConverter();
+    }
+
+    @Override
+    public TypeToken<Period> type() {
+        return TypeToken.from(Period.class);
     }
 
     @Override

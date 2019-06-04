@@ -16,6 +16,7 @@
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 
 public class AtomicBooleanStringConverter implements StringConverter<AtomicBoolean> {
     private static BooleanStringConverter BOOLEAN_CONVERTER = BooleanStringConverter.create();
@@ -24,6 +25,11 @@ public class AtomicBooleanStringConverter implements StringConverter<AtomicBoole
 
     public static AtomicBooleanStringConverter create() {
         return new AtomicBooleanStringConverter();
+    }
+
+    @Override
+    public TypeToken<AtomicBoolean> type() {
+        return TypeToken.from(AtomicBoolean.class);
     }
 
     @Override

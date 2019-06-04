@@ -16,13 +16,18 @@
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
 import java.time.Duration;
-import java.time.Instant;
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 
 public class DurationStringConverter implements StringConverter<Duration> {
     private DurationStringConverter() { }
 
     public static DurationStringConverter create() {
         return new DurationStringConverter();
+    }
+
+    @Override
+    public TypeToken<Duration> type() {
+        return TypeToken.from(Duration.class);
     }
 
     @Override

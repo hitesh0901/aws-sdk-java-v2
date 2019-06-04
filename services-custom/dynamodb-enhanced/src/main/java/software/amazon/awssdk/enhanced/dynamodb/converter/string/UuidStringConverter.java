@@ -16,12 +16,18 @@
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
 import java.util.UUID;
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 
 public class UuidStringConverter implements StringConverter<UUID> {
     private UuidStringConverter() { }
 
     public static UuidStringConverter create() {
         return new UuidStringConverter();
+    }
+
+    @Override
+    public TypeToken<UUID> type() {
+        return TypeToken.from(UUID.class);
     }
 
     @Override

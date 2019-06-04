@@ -15,8 +15,8 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
-import java.util.OptionalInt;
 import java.util.OptionalLong;
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 
 public class OptionalLongStringConverter implements StringConverter<OptionalLong> {
     private static LongStringConverter LONG_CONVERTER = LongStringConverter.create();
@@ -25,6 +25,11 @@ public class OptionalLongStringConverter implements StringConverter<OptionalLong
 
     public static OptionalLongStringConverter create() {
         return new OptionalLongStringConverter();
+    }
+
+    @Override
+    public TypeToken<OptionalLong> type() {
+        return TypeToken.from(OptionalLong.class);
     }
 
     @Override

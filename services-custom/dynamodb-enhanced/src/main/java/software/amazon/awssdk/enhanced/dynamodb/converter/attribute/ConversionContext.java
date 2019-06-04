@@ -25,15 +25,15 @@ import software.amazon.awssdk.utils.builder.CopyableBuilder;
 import software.amazon.awssdk.utils.builder.ToCopyableBuilder;
 
 /**
- * The context associated with a single {@link ItemAttributeValueConverter#fromAttributeValue} or
- * {@link ItemAttributeValueConverter#toAttributeValue} call.
+ * The context associated with a single {@link AttributeConverter#fromAttributeValue} or
+ * {@link AttributeConverter#toAttributeValue} call.
  *
  * <p>
  * This includes helpful information that the converter can use for debugging purposes or in its implementation of the
  * converter itself. Not all converters will require information from the context.
  *
  * <p>
- * @see ItemAttributeValueConverter
+ * @see AttributeConverter
  */
 @SdkPublicApi
 @ThreadSafe
@@ -66,17 +66,7 @@ public interface ConversionContext extends ToCopyableBuilder<ConversionContext.B
      */
     Optional<String> attributeName();
 
-    /**
-     * The conversion chain associated with the item being converted.
-     *
-     * <p>
-     * This is useful for implementing container types, where the original conversion chain is needed to convert sub-members.
-     * For example, a list converter would likely use this converter for each of the members in the list.
-     *
-     * <p>
-     * This call should never fail with an {@link Exception}.
-     */
-    ItemAttributeValueConverter converter();
+    SubtypeAttributeConverter<Object> converter();
 
     /**
      * A builder for defining and creating a {@link ConversionContext}. This can be created with {@link #builder()}.
@@ -94,15 +84,7 @@ public interface ConversionContext extends ToCopyableBuilder<ConversionContext.B
          */
         Builder attributeName(String attributeName);
 
-        /**
-         * Specify the conversion chain associated with the item being converted.
-         *
-         * <p>
-         * This call should never fail with an {@link Exception}.
-         *
-         * @see #converter()
-         */
-        Builder converter(ItemAttributeValueConverter converter);
+        Builder converter(SubtypeAttributeConverter<Object> converter);
 
         /**
          * Build a {@link ConversionContext} from the provided configuration. This method can be invoked multiple times to

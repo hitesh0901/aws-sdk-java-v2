@@ -15,11 +15,18 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
+
 public class ByteStringConverter implements StringConverter<Byte> {
     private ByteStringConverter() { }
 
     public static ByteStringConverter create() {
         return new ByteStringConverter();
+    }
+
+    @Override
+    public TypeToken<Byte> type() {
+        return Byte.class;
     }
 
     @Override

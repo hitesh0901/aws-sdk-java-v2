@@ -15,11 +15,18 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
+
 public class DoubleStringConverter implements StringConverter<Double> {
     private DoubleStringConverter() { }
 
     public static DoubleStringConverter create() {
         return new DoubleStringConverter();
+    }
+
+    @Override
+    public TypeToken<Double> type() {
+        return TypeToken.from(Double.class);
     }
 
     @Override

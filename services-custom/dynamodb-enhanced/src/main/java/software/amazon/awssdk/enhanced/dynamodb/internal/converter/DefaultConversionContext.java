@@ -19,7 +19,7 @@ import java.util.Optional;
 import software.amazon.awssdk.annotations.SdkInternalApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionContext;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ItemAttributeValueConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.AttributeConverter;
 import software.amazon.awssdk.utils.Validate;
 
 /**
@@ -29,7 +29,7 @@ import software.amazon.awssdk.utils.Validate;
 @ThreadSafe
 public class DefaultConversionContext implements ConversionContext {
     private final String attributeName;
-    private final ItemAttributeValueConverter converter;
+    private final AttributeConverter converter;
 
     private DefaultConversionContext(DefaultConversionContext.Builder builder) {
         this.attributeName = builder.attributeName;
@@ -47,7 +47,7 @@ public class DefaultConversionContext implements ConversionContext {
         return Optional.ofNullable(this.attributeName);
     }
 
-    public ItemAttributeValueConverter converter() {
+    public AttributeConverter converter() {
         return converter;
     }
 
@@ -58,7 +58,7 @@ public class DefaultConversionContext implements ConversionContext {
 
     public static final class Builder implements ConversionContext.Builder {
         private String attributeName;
-        private ItemAttributeValueConverter converter;
+        private AttributeConverter converter;
 
         private Builder() {}
 
@@ -72,7 +72,7 @@ public class DefaultConversionContext implements ConversionContext {
             return this;
         }
 
-        public ConversionContext.Builder converter(ItemAttributeValueConverter converter) {
+        public ConversionContext.Builder converter(AttributeConverter converter) {
             this.converter = converter;
             return this;
         }

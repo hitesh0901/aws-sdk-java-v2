@@ -15,10 +15,13 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
-public interface SubtypeStringConverter<T> {
+import software.amazon.awssdk.enhanced.dynamodb.converter.Converter;
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
+
+public interface SubtypeStringConverter<T> extends Converter<T> {
     default String toString(T object) {
         return object.toString();
     }
 
-    <U extends T> U fromString(Class<U> desiredType, String string);
+    <U extends T> U fromString(TypeToken<U> desiredType, String string);
 }

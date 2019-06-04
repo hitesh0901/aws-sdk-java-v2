@@ -15,36 +15,30 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.attribute;
 
-import software.amazon.awssdk.annotations.Immutable;
+import java.util.function.Consumer;
 import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
+import software.amazon.awssdk.enhanced.dynamodb.converter.Converter;
 import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 
-/**
- * Identity converter, allowing a customer to specify or request an {@link ItemAttributeValue} directly.
- */
 @SdkPublicApi
 @ThreadSafe
-@Immutable
-public final class IdentityAttributeConverter extends ExactInstanceOfAttributeConverter<ItemAttributeValue> {
-    private IdentityAttributeConverter() {
-        super(ItemAttributeValue.class);
+public interface AttributeConverter<T> extends Converter<T> {
+    ItemAttributeValue toAttributeValue(T input, ConversionContext context);
+
+    T fromAttributeValue(ItemAttributeValue input, ConversionContext context);
+
+    default ItemAttributeValue toAttributeValue(T input, Consumer<ConversionContext.Builder> contextConsumer) {
+        ConversionContext.Builder context = ConversionContext.builder();
+        contextConsumer.accept(context);
+        return toAttributeValue(input, context.build());
     }
 
-    public static IdentityAttributeConverter create() {
-        return new IdentityAttributeConverter();
-    }
-
-    @Override
-    protected ItemAttributeValue convertToAttributeValue(ItemAttributeValue input, ConversionContext context) {
-        return input;
-    }
-
-    @Override
-    protected ItemAttributeValue convertFromAttributeValue(ItemAttributeValue input,
-                                                           TypeToken<?> desiredType,
-                                                           ConversionContext context) {
-        return input;
+    default Object fromAttributeValue(ItemAttributeValue input,
+                                      Consumer<ConversionContext.Builder> contextConsumer) {
+        ConversionContext.Builder context = ConversionContext.builder();
+        contextConsumer.accept(context);
+        return fromAttributeValue(input, context.build());
     }
 }

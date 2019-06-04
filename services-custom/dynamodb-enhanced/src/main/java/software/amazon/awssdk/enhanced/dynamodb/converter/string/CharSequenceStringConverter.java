@@ -15,11 +15,18 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
+
 public class CharSequenceStringConverter implements StringConverter<CharSequence> {
     private CharSequenceStringConverter() { }
 
     public static CharSequenceStringConverter create() {
         return new CharSequenceStringConverter();
+    }
+
+    @Override
+    public TypeToken<CharSequence> type() {
+        return TypeToken.from(CharSequence.class);
     }
 
     @Override

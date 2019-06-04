@@ -16,6 +16,7 @@
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
 import java.util.OptionalDouble;
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 
 public class OptionalDoubleStringConverter implements StringConverter<OptionalDouble> {
     private static DoubleStringConverter DOUBLE_CONVERTER = DoubleStringConverter.create();
@@ -24,6 +25,11 @@ public class OptionalDoubleStringConverter implements StringConverter<OptionalDo
 
     public static OptionalDoubleStringConverter create() {
         return new OptionalDoubleStringConverter();
+    }
+
+    @Override
+    public TypeToken<OptionalDouble> type() {
+        return TypeToken.from(OptionalDouble.class);
     }
 
     @Override

@@ -20,21 +20,21 @@ import java.util.List;
 import java.util.Map;
 import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.core.SdkBytes;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ItemAttributeValueConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.AttributeConverter;
 import software.amazon.awssdk.utils.Validate;
 
 /**
  * A visitor across all possible types of a {@link ItemAttributeValue}.
  *
  * <p>
- * This is useful in {@link ItemAttributeValueConverter} implementations, without having to write a switch statement on the
+ * This is useful in {@link AttributeConverter} implementations, without having to write a switch statement on the
  * {@link ItemAttributeValue#type()}.
  *
  * @see ItemAttributeValue#convert(TypeConvertingVisitor)
  */
 @SdkPublicApi
 public abstract class TypeConvertingVisitor<T> {
-    private final Class<? extends ItemAttributeValueConverter> converterClass;
+    private final Class<?> converterClass;
     protected final Class<?> targetType;
 
     /**
@@ -65,7 +65,7 @@ public abstract class TypeConvertingVisitor<T> {
      * @param converterClass The converter implementation that is creating this visitor. This may be null.
      */
     protected TypeConvertingVisitor(Class<?> targetType,
-                                    Class<? extends ItemAttributeValueConverter> converterClass) {
+                                    Class<?> converterClass) {
         Validate.paramNotNull(targetType, "targetType");
         this.targetType = targetType;
         this.converterClass = converterClass;

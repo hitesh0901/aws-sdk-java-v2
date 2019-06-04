@@ -17,7 +17,7 @@ package software.amazon.awssdk.enhanced.dynamodb.converter.item.bundled.bean;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ItemAttributeValueConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.AttributeConverter;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 import software.amazon.awssdk.utils.Validate;
 import software.amazon.awssdk.utils.builder.CopyableBuilder;
@@ -30,7 +30,7 @@ public final class BeanAttributeSchema<B, A>
     private final String attributeName;
     private final Getter<B, A> getter;
     private final Setter<B, A> setter;
-    private final ItemAttributeValueConverter converter;
+    private final AttributeConverter<A> converter;
 
     private BeanAttributeSchema(Builder<B, A> builder) {
         this.beanType = Validate.notNull(builder.beanType, "beanType");
@@ -65,7 +65,7 @@ public final class BeanAttributeSchema<B, A>
         return setter;
     }
 
-    public ItemAttributeValueConverter converter() {
+    public AttributeConverter converter() {
         return converter;
     }
 
@@ -89,7 +89,7 @@ public final class BeanAttributeSchema<B, A>
         private String attributeName;
         private Getter<B, A> getter;
         private Setter<B, A> setter;
-        private ItemAttributeValueConverter converter;
+        private AttributeConverter<A> converter;
 
         private Builder(TypeToken<B> beanType, TypeToken<A> attributeType) {
             this.beanType = beanType;
@@ -111,7 +111,7 @@ public final class BeanAttributeSchema<B, A>
             return this;
         }
 
-        public Builder<B, A> converter(ItemAttributeValueConverter converter) {
+        public Builder<B, A> converter(AttributeConverter<A> converter) {
             this.converter = converter;
             return this;
         }

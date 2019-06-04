@@ -19,53 +19,43 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeConvertingVisitor;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 
-public class StaticListAttributeConverter extends InstanceOfAttributeConverter<List<?>> {
-    private final Class<?> elementType;
-    private final ItemAttributeValueConverter elementConverter;
+public class StaticListAttributeConverter<T> implements AttributeConverter<List<T>> {
+    private final AttributeConverter<T> elementConverter;
 
-    private StaticListAttributeConverter(Class<?> elementType, ItemAttributeValueConverter elementConverter) {
-        super(List.class);
-        this.elementType = elementType;
+    private StaticListAttributeConverter(AttributeConverter<T> elementConverter) {
         this.elementConverter = elementConverter;
     }
 
-    public static StaticListAttributeConverter create(ExactInstanceOfAttributeConverter<?> elementConverter) {
-        return new StaticListAttributeConverter(elementConverter.type(), elementConverter);
+    public static <T> StaticListAttributeConverter<T> create(AttributeConverter<T> elementConverter) {
+        return new StaticListAttributeConverter<>(elementConverter);
     }
 
     @Override
-    protected ItemAttributeValue convertToAttributeValue(List<?> input, ConversionContext conversionContext) {
+    public TypeToken<List<T>> type() {
+        return TypeToken.listOf(elementConverter.type());
+    }
+
+    @Override
+    public ItemAttributeValue toAttributeValue(List<T> input, ConversionContext context) {
         return ItemAttributeValue.fromListOfAttributeValues(input.stream()
-                                                                 .map(e -> elementToAttributeValue(e, conversionContext))
+                                                                 .map(e -> elementConverter.toAttributeValue(e, context))
                                                                  .collect(toList()));
     }
 
     @Override
-    protected List<?> convertFromAttributeValue(ItemAttributeValue input, TypeToken<?> desiredType, ConversionContext context) {
-        return input.convert(new TypeConvertingVisitor<List<?>>(List.class, StaticListAttributeConverter.class) {
+    public List<T> fromAttributeValue(ItemAttributeValue input, ConversionContext context) {
+        return input.convert(new TypeConvertingVisitor<List<T>>(List.class, StaticListAttributeConverter.class) {
             @Override
-            public List<?> convertListOfAttributeValues(Collection<ItemAttributeValue> value) {
+            public List<T> convertListOfAttributeValues(Collection<ItemAttributeValue> value) {
                 return value.stream()
-                            .map(attribute -> elementFromAttributeValue(attribute, context))
-                            .collect(toList());
+                            .map(attribute -> elementConverter.fromAttributeValue(attribute, context))
+                            .collect(Collectors.toList());
             }
         });
-    }
-
-    private ItemAttributeValue elementToAttributeValue(Object element, ConversionContext conversionContext) {
-        return elementConverter.toAttributeValue(element, c -> c.attributeName(conversionContext.attributeName().orElse(null))
-                                                                .converter(elementConverter));
-    }
-
-    private Object elementFromAttributeValue(ItemAttributeValue attribute, ConversionContext context) {
-        return elementConverter.fromAttributeValue(
-                attribute,
-                TypeToken.from(elementType),
-                ctx -> ctx.attributeName(context.attributeName().orElse(null))
-                          .converter(elementConverter));
     }
 }

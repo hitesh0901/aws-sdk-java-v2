@@ -24,7 +24,7 @@ import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.enhanced.dynamodb.AsyncTable;
 import software.amazon.awssdk.enhanced.dynamodb.Table;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ItemAttributeValueConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.AttributeConverter;
 import software.amazon.awssdk.enhanced.dynamodb.internal.model.DefaultRequestItem;
 import software.amazon.awssdk.utils.builder.CopyableBuilder;
 import software.amazon.awssdk.utils.builder.ToCopyableBuilder;
@@ -59,7 +59,7 @@ public interface RequestItem extends ConverterAware,
      * Convert this request item into a {@link GeneratedRequestItem} using the converters attached to this item, only.
      *
      * This will not use the default converter chain or any converters associated with the client unless they were explicitly
-     * added via {@link Builder#addConverter(ItemAttributeValueConverter)} (or similar methods).
+     * added via {@link Builder#addConverter(AttributeConverter)} (or similar methods).
      *
      * <p>
      * Reasons this call may fail with a {@link RuntimeException}:
@@ -78,10 +78,10 @@ public interface RequestItem extends ConverterAware,
                               AttributeAware.Builder<Object>,
                               CopyableBuilder<RequestItem.Builder, RequestItem> {
         @Override
-        Builder addConverters(Collection<? extends ItemAttributeValueConverter> converters);
+        Builder addConverters(Collection<? extends AttributeConverter> converters);
 
         @Override
-        Builder addConverter(ItemAttributeValueConverter converter);
+        Builder addConverter(AttributeConverter converter);
 
         @Override
         Builder clearConverters();

@@ -33,7 +33,7 @@ import software.amazon.awssdk.enhanced.dynamodb.model.RequestItem;
 import software.amazon.awssdk.enhanced.dynamodb.model.ResponseItem;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 
-public class DefaultConverterChainTest {
+public class DefaultAttributeConverterTest {
     private static final DefaultConverterChain CHAIN = DefaultConverterChain.create();
 
     @Test

@@ -17,21 +17,18 @@ package software.amazon.awssdk.enhanced.dynamodb.converter.attribute;
 
 import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionCondition;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionContext;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ItemAttributeValueConverter;
 import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 import software.amazon.awssdk.utils.Validate;
 
 /**
- * A base class that simplifies the process of implementing an {@link ItemAttributeValueConverter} with the
+ * A base class that simplifies the process of implementing an {@link AttributeConverter} with the
  * {@link ConversionCondition#isInstanceOf(Class)} conversion type. This handles casting to/from the mapped type and
  * validates that the converter is being invoked with the correct types.
  */
 @SdkPublicApi
 @ThreadSafe
-public abstract class InstanceOfAttributeConverter<T> implements ItemAttributeValueConverter {
+public abstract class InstanceOfAttributeConverter<T> implements AttributeConverter {
     private final Class<T> type;
 
     protected InstanceOfAttributeConverter(Class<?> type) {
@@ -61,7 +58,7 @@ public abstract class InstanceOfAttributeConverter<T> implements ItemAttributeVa
         return convertFromAttributeValue(input, desiredType, context);
     }
 
-    public Class<T> type() {
+    public TypeToken type() {
         return type;
     }
 

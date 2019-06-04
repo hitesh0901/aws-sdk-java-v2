@@ -22,40 +22,43 @@ import software.amazon.awssdk.annotations.NotThreadSafe;
 import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.DefaultConverterChain;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ItemAttributeValueConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.DefaultAttributeConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.AttributeConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.SubtypeAttributeConverter;
 
 /**
- * An interface applied to all objects that wish to expose their underlying {@link ItemAttributeValueConverter}s.
+ * An interface applied to all objects that wish to expose their underlying {@link AttributeConverter}s.
  *
  * <p>
- * See {@link ItemAttributeValueConverter} for a detailed explanation of how the enhanced client converts between Java types
+ * See {@link AttributeConverter} for a detailed explanation of how the enhanced client converts between Java types
  * and DynamoDB types.
  */
 @SdkPublicApi
 @ThreadSafe
 @Immutable
-public interface ConverterAware {
+public interface ConverterAware<T> {
     /**
      * Retrieve all converters that were directly configured on this object.
      *
      * <p>
      * This call should never fail with an {@link Exception}.
      */
-    List<ItemAttributeValueConverter> converters();
+    List<AttributeConverter<? extends T>> converters();
+
+    List<SubtypeAttributeConverter<? extends T>> subtypeConverters();
 
     /**
-     * An interface applied to all objects that can be configured with {@link ItemAttributeValueConverter}s.
+     * An interface applied to all objects that can be configured with {@link AttributeConverter}s.
      *
      * <p>
-     * See {@link ItemAttributeValueConverter} for a detailed explanation of how the enhanced client converts between Java types
+     * See {@link AttributeConverter} for a detailed explanation of how the enhanced client converts between Java types
      * and DynamoDB types.
      *
      * <p>
      * This call should never fail with an {@link Exception}.
      */
     @NotThreadSafe
-    interface Builder {
+    interface Builder<T> {
         /**
          * Add all of the provided converters to this builder, in the order of the provided collection.
          *
@@ -69,7 +72,7 @@ public interface ConverterAware {
          *
          * <p>
          * Converters configured in {@link DynamoDbEnhancedClient.Builder} always take precedence over the ones provided by the
-         * {@link DefaultConverterChain}.
+         * {@link DefaultAttributeConverter}.
          *
          * <p>
          * Reasons this call may fail with a {@link RuntimeException}:
@@ -79,9 +82,9 @@ public interface ConverterAware {
          *     This method is not thread safe.</li>
          * </ol>
          *
-         * @see ItemAttributeValueConverter
+         * @see AttributeConverter
          */
-        Builder addConverters(Collection<? extends ItemAttributeValueConverter> converters);
+        Builder<T> addConverters(Collection<? extends AttributeConverter<? extends T>> converters);
 
         /**
          * Add a converter to this builder.
@@ -96,7 +99,7 @@ public interface ConverterAware {
          *
          * <p>
          * Converters configured in {@link DynamoDbEnhancedClient.Builder} always take precedence over the ones provided by the
-         * {@link DefaultConverterChain}.
+         * {@link DefaultAttributeConverter}.
          *
          * <p>
          * Reasons this call may fail with a {@link RuntimeException}:
@@ -106,15 +109,19 @@ public interface ConverterAware {
          *     This method is not thread safe.</li>
          * </ol>
          */
-        Builder addConverter(ItemAttributeValueConverter converter);
+        Builder<T> addConverter(AttributeConverter<? extends T> converter);
+
+        Builder<T> addSubtypeConverters(Collection<? extends SubtypeAttributeConverter<? extends T>> converters);
+
+        Builder<T> addSubtypeConverter(SubtypeAttributeConverter<? extends T> converter);
 
         /**
          * Reset the converters that were previously added with {@link #addConverters(Collection)} or
-         * {@link #addConverter(ItemAttributeValueConverter)}.
+         * {@link #addConverter(AttributeConverter)}.
          *
          * <p>
          * This <b>does not</b> reset converters configured elsewhere. Converters configured in other locations, such as in the
-         * {@link DefaultConverterChain}, will still be used.
+         * {@link DefaultAttributeConverter}, will still be used.
          *
          * <p>
          * Reasons this call may fail with a {@link RuntimeException}:
@@ -123,6 +130,8 @@ public interface ConverterAware {
          *     This method is not thread safe.</li>
          * </ol>
          */
-        Builder clearConverters();
+        Builder<T> clearConverters();
+
+        Builder<T> clearSubtypeConverters();
     }
 }

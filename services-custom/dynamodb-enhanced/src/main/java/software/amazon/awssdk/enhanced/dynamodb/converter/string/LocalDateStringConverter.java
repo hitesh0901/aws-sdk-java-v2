@@ -16,12 +16,18 @@
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
 import java.time.LocalDate;
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 
 public class LocalDateStringConverter implements StringConverter<LocalDate> {
     private LocalDateStringConverter() { }
 
     public static LocalDateStringConverter create() {
         return new LocalDateStringConverter();
+    }
+
+    @Override
+    public TypeToken<LocalDate> type() {
+        return TypeToken.from(LocalDate.class);
     }
 
     @Override

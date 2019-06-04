@@ -16,12 +16,18 @@
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
 import java.math.BigDecimal;
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 
 public class BigDecimalStringConverter implements StringConverter<BigDecimal> {
     private BigDecimalStringConverter() { }
 
     public static BigDecimalStringConverter create() {
         return new BigDecimalStringConverter();
+    }
+
+    @Override
+    public TypeToken<BigDecimal> type() {
+        return TypeToken.from(BigDecimal.class);
     }
 
     @Override

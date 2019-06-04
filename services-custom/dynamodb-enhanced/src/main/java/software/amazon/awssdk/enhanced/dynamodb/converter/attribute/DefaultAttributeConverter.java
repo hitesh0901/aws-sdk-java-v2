@@ -23,14 +23,14 @@ import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
-import software.amazon.awssdk.enhanced.dynamodb.internal.converter.ItemAttributeValueConverterChain;
+import software.amazon.awssdk.enhanced.dynamodb.internal.converter.AttributeConverterChain;
 import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.RequestItem;
 import software.amazon.awssdk.enhanced.dynamodb.model.ResponseItem;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 
 /**
- * A {@link ItemAttributeValueConverter} that includes all of the converters built into the SDK.
+ * A {@link AttributeConverter} that includes all of the converters built into the SDK.
  *
  * <p>
  * This is the root converter for all created {@link DynamoDbEnhancedClient}s and {@link DynamoDbEnhancedAsyncClient}s.
@@ -69,43 +69,45 @@ import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 @SdkPublicApi
 @ThreadSafe
 @Immutable
-public final class DefaultConverterChain implements ItemAttributeValueConverter {
-    private static final ItemAttributeValueConverter CHAIN;
+public final class DefaultAttributeConverter implements SubtypeAttributeConverter<Object> {
+    private static final SubtypeAttributeConverter<Object> CHAIN;
 
     static {
-        CHAIN = ItemAttributeValueConverterChain.builder()
-                                                // Exact InstanceOf Converters
+        CHAIN = AttributeConverterChain.builder()
+                                       // Exact InstanceOf Converters
 
-                                                .addConverter(InstantAttributeConverter.create())
-                                                .addConverter(IntegerAttributeConverter.create())
-                                                .addConverter(StringAttributeAttributeConverter.create())
-                                                .addConverter(IdentityAttributeConverter.create())
+                                       .addConverter(InstantAttributeConverter.create())
+                                       .addConverter(IntegerAttributeConverter.create())
+                                       .addConverter(StringAttributeConverter.create())
+                                       .addConverter(AttributeAttributeConverter.create())
 
-                                                // InstanceOf Converters
-                                                // Potential optimization: allow InstanceOf converters to specify a set of
-                                                // types that should be cached in an eager fashion (e.g. DefaultRequestItem)
-                                                .addConverter(RequestItemAttributeConverter.create())
-                                                .addConverter(ResponseItemAttributeConverter.create())
-                                                .addConverter(DynamicListAttributeConverter.create())
-                                                .addConverter(DynamicMapAttributeConverter.create())
-                                                .build();
+                                       // InstanceOf Converters
+                                       // Potential optimization: allow InstanceOf converters to specify a set of
+                                       // types that should be cached in an eager fashion (e.g. DefaultRequestItem)
+                                       .addConverter(RequestItemAttributeConverter.create())
+                                       .addConverter(ResponseItemAttributeConverter.create())
+                                       .addSubtypeConverter(DynamicListAttributeConverter.create())
+                                       .addSubtypeConverter(DynamicMapAttributeConverter.create())
+                                       .build();
     }
 
-    private DefaultConverterChain() {}
+    private DefaultAttributeConverter() {}
 
     /**
      * Create a default convert chain that contains all of the converters built into the SDK.
      *
      * <p>
      * This call should never fail with an {@link Exception}.
+     *
+     * TODO: Default attribute converter uses create(), and default string converter uses instance().
      */
-    public static DefaultConverterChain create() {
-        return new DefaultConverterChain();
+    public static DefaultAttributeConverter create() {
+        return new DefaultAttributeConverter();
     }
 
     @Override
-    public ConversionCondition conversionCondition() {
-        return CHAIN.conversionCondition();
+    public TypeToken<Object> type() {
+        return TypeToken.from(Object.class);
     }
 
     @Override
@@ -114,7 +116,7 @@ public final class DefaultConverterChain implements ItemAttributeValueConverter 
     }
 
     @Override
-    public Object fromAttributeValue(ItemAttributeValue input, TypeToken<?> desiredType, ConversionContext context) {
+    public <U> U fromAttributeValue(ItemAttributeValue input, TypeToken<U> desiredType, ConversionContext context) {
         return CHAIN.fromAttributeValue(input, desiredType, context);
     }
 }

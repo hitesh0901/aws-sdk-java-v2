@@ -33,24 +33,23 @@ import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 @SdkPublicApi
 @ThreadSafe
 @Immutable
-public final class ResponseItemAttributeConverter extends ExactInstanceOfAttributeConverter<ResponseItem> {
-    private ResponseItemAttributeConverter() {
-        super(ResponseItem.class);
-    }
-
+public final class ResponseItemAttributeConverter implements AttributeConverter<ResponseItem> {
     public static ResponseItemAttributeConverter create() {
         return new ResponseItemAttributeConverter();
     }
 
     @Override
-    protected ItemAttributeValue convertToAttributeValue(ResponseItem input, ConversionContext context) {
+    public TypeToken<ResponseItem> type() {
+        return TypeToken.from(ResponseItem.class);
+    }
+
+    @Override
+    public ItemAttributeValue toAttributeValue(ResponseItem input, ConversionContext context) {
         throw new UnsupportedOperationException("Cannot convert a ResponseItem to an ItemAttributeValue.");
     }
 
     @Override
-    protected ResponseItem convertFromAttributeValue(ItemAttributeValue input,
-                                                     TypeToken<?> desiredType,
-                                                     ConversionContext context) {
+    public ResponseItem fromAttributeValue(ItemAttributeValue input, ConversionContext context) {
         return input.convert(new TypeConvertingVisitor<ResponseItem>(ResponseItem.class, ResponseItemAttributeConverter.class) {
             @Override
             public ResponseItem convertMap(Map<String, ItemAttributeValue> value) {

@@ -15,6 +15,8 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.model;
 
+import static java.util.stream.Collectors.toList;
+
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -45,6 +47,7 @@ import software.amazon.awssdk.utils.Validate;
 @ThreadSafe
 @Immutable
 public class TypeToken<T> {
+    private final boolean isWildcard;
     private final Class<T> rawClass;
     private final List<TypeToken<?>> rawClassParameters;
 
@@ -66,14 +69,23 @@ public class TypeToken<T> {
             validateIsSupportedType(type);
         }
 
-        this.rawClass = validateAndConvert(type);
-        this.rawClassParameters = loadTypeParameters(type);
+
+        if (type instanceof WildcardType) {
+            this.isWildcard = true;
+            this.rawClass = null;
+            this.rawClassParameters = null;
+        } else {
+            this.isWildcard = false;
+            this.rawClass = validateAndConvert(type);
+            this.rawClassParameters = loadTypeParameters(type);
+        }
     }
 
     private TypeToken(Class<?> rawClass, List<TypeToken<?>> rawClassParameters) {
         // This is only used internally, so we can make sure this cast is safe via testing.
         this.rawClass = (Class<T>) rawClass;
         this.rawClassParameters = rawClassParameters;
+        this.isWildcard = false;
     }
 
     /**
@@ -146,8 +158,20 @@ public class TypeToken<T> {
         Validate.validState(!(type instanceof GenericArrayType),
                             "Array type %s is not supported. Use java.util.List instead of arrays.", type);
         Validate.validState(!(type instanceof TypeVariable), "Type variable type %s is not supported.", type);
-        Validate.validState(!(type instanceof WildcardType), "Wildcard type %s is not supported.", type);
+
+        if (type instanceof WildcardType) {
+            WildcardType wildcardType = (WildcardType) type;
+            Validate.validState(wildcardType.getUpperBounds().length == 1 && wildcardType.getUpperBounds()[0] == Object.class,
+                                "Non-Object wildcard type upper bounds are not supported.");
+            Validate.validState(wildcardType.getLowerBounds().length == 0,
+                                "Wildcard type lower bounds are not supported.");
+        }
+
         return type;
+    }
+
+    public boolean isWildcard() {
+        return isWildcard;
     }
 
     /**
@@ -156,6 +180,7 @@ public class TypeToken<T> {
      * e.g. For {@code TypeToken<String>}, this would return {@code String.class}.
      */
     public Class<T> rawClass() {
+        Validate.isTrue(!isWildcard, "A wildcard type is not expected here.");
         return rawClass;
     }
 
@@ -170,7 +195,35 @@ public class TypeToken<T> {
      * If there are no type parameters, this will return an empty list.
      */
     public List<TypeToken<?>> rawClassParameters() {
+        Validate.isTrue(!isWildcard, "A wildcard type is not expected here.");
         return rawClassParameters;
+    }
+
+    public boolean isSuperTypeOf(TypeToken<?> rhs) {
+        // Covariant or contravariant wildcard types aren't supported, so if we're a wildcard then we're a supertype.
+        if (isWildcard) {
+            return true;
+        }
+
+        // If they aren't assignable to us, then we're obviously not a subtype.
+        if (!rawClass.isAssignableFrom(rhs.rawClass)) {
+            return false;
+        }
+
+        // Now things are tricky - if they are definitely a subtype of us,
+        if (rawClass.equals(rhs.rawClass)) {
+            if (rawClassParameters.size() != rhs.rawClassParameters.size()) {
+                return false;
+            }
+
+            for (int i = 0; i < rawClassParameters.size(); i++) {
+                if (!rawClassParameters.get(i).isSuperTypeOf(rhs.rawClassParameters.get(i))) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     private Type captureGenericTypeArguments() {
@@ -205,8 +258,8 @@ public class TypeToken<T> {
         return Collections.unmodifiableList(
                 Arrays.stream(parameterizedType.getActualTypeArguments())
                       .peek(t -> Validate.validState(t != null, "Invalid type argument."))
-                      .map(TypeToken::from)
-                      .collect(Collectors.toList()));
+                      .map(TypeToken::new)
+                      .collect(toList()));
     }
 
     @Override

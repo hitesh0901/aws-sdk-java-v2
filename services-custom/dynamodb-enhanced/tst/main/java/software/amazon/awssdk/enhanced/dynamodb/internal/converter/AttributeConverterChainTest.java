@@ -26,17 +26,17 @@ import software.amazon.awssdk.enhanced.dynamodb.converter.ConversionCondition;
 import software.amazon.awssdk.enhanced.dynamodb.converter.ConversionContext;
 import software.amazon.awssdk.enhanced.dynamodb.converter.ItemAttributeValueConverter;
 
-public class ItemAttributeValueConverterChainTest {
+public class AttributeConverterChainTest {
     @Test
     public void exactInstanceOfConvertersAreHighestPriority() {
         ItemAttributeValueConverter exactInstanceConverter = converter(ConversionCondition.isExactInstanceOf(String.class));
         ItemAttributeValueConverter instanceConverter = converter(ConversionCondition.isInstanceOf(CharSequence.class));
 
-        ItemAttributeValueConverterChain chain =
-                ItemAttributeValueConverterChain.builder()
-                                                .addConverter(instanceConverter)
-                                                .addConverter(exactInstanceConverter)
-                                                .build();
+        AttributeConverterChain chain =
+                AttributeConverterChain.builder()
+                                       .addConverter(instanceConverter)
+                                       .addConverter(exactInstanceConverter)
+                                       .build();
 
         chain.toAttributeValue("", ConversionContext.builder().converter(chain).build());
 
@@ -48,10 +48,10 @@ public class ItemAttributeValueConverterChainTest {
     public void instanceOfConvertersWorkForSubtypes() {
         ItemAttributeValueConverter instanceConverter = converter(ConversionCondition.isInstanceOf(CharSequence.class));
 
-        ItemAttributeValueConverterChain chain =
-                ItemAttributeValueConverterChain.builder()
-                                                .addConverter(instanceConverter)
-                                                .build();
+        AttributeConverterChain chain =
+                AttributeConverterChain.builder()
+                                       .addConverter(instanceConverter)
+                                       .build();
 
         chain.toAttributeValue("", ConversionContext.builder().converter(chain).build());
 
@@ -63,11 +63,11 @@ public class ItemAttributeValueConverterChainTest {
         ItemAttributeValueConverter instanceConverter = converter(ConversionCondition.isInstanceOf(CharSequence.class));
         ItemAttributeValueConverter instanceConverter2 = converter(ConversionCondition.isInstanceOf(CharSequence.class));
 
-        ItemAttributeValueConverterChain chain =
-                ItemAttributeValueConverterChain.builder()
-                                                .addConverter(instanceConverter)
-                                                .addConverter(instanceConverter2)
-                                                .build();
+        AttributeConverterChain chain =
+                AttributeConverterChain.builder()
+                                       .addConverter(instanceConverter)
+                                       .addConverter(instanceConverter2)
+                                       .build();
 
         chain.toAttributeValue("", ConversionContext.builder().converter(chain).build());
 
@@ -80,11 +80,11 @@ public class ItemAttributeValueConverterChainTest {
         ItemAttributeValueConverter instanceConverter = converter(ConversionCondition.isExactInstanceOf(String.class));
         ItemAttributeValueConverter instanceConverter2 = converter(ConversionCondition.isExactInstanceOf(String.class));
 
-        ItemAttributeValueConverterChain chain =
-                ItemAttributeValueConverterChain.builder()
-                                                .addConverter(instanceConverter)
-                                                .addConverter(instanceConverter2)
-                                                .build();
+        AttributeConverterChain chain =
+                AttributeConverterChain.builder()
+                                       .addConverter(instanceConverter)
+                                       .addConverter(instanceConverter2)
+                                       .build();
 
         chain.toAttributeValue("", ConversionContext.builder().converter(chain).build());
 
@@ -98,12 +98,12 @@ public class ItemAttributeValueConverterChainTest {
         ItemAttributeValueConverter instanceConverter = converter(ConversionCondition.isInstanceOf(String.class));
         ItemAttributeValueConverter parent = converter(ConversionCondition.isInstanceOf(Object.class));
 
-        ItemAttributeValueConverterChain chain =
-                ItemAttributeValueConverterChain.builder()
-                                                .addConverter(exactInstanceConverter)
-                                                .addConverter(instanceConverter)
-                                                .parent(parent)
-                                                .build();
+        AttributeConverterChain chain =
+                AttributeConverterChain.builder()
+                                       .addConverter(exactInstanceConverter)
+                                       .addConverter(instanceConverter)
+                                       .parent(parent)
+                                       .build();
 
         chain.toAttributeValue(1, ConversionContext.builder().converter(chain).build());
 
@@ -117,11 +117,11 @@ public class ItemAttributeValueConverterChainTest {
         ItemAttributeValueConverter exactInstanceConverter = converter(ConversionCondition.isExactInstanceOf(String.class));
         ItemAttributeValueConverter instanceConverter = converter(ConversionCondition.isInstanceOf(String.class));
 
-        ItemAttributeValueConverterChain chain =
-                ItemAttributeValueConverterChain.builder()
-                                                .addConverter(exactInstanceConverter)
-                                                .addConverter(instanceConverter)
-                                                .build();
+        AttributeConverterChain chain =
+                AttributeConverterChain.builder()
+                                       .addConverter(exactInstanceConverter)
+                                       .addConverter(instanceConverter)
+                                       .build();
 
         assertThatThrownBy(() -> chain.toAttributeValue(1, ConversionContext.builder().converter(chain).build()))
                 .isInstanceOf(IllegalStateException.class);
@@ -129,8 +129,8 @@ public class ItemAttributeValueConverterChainTest {
 
     @Test
     public void nestedChainsDoNotRewrap() {
-        ItemAttributeValueConverterChain chain = ItemAttributeValueConverterChain.builder().build();
-        ItemAttributeValueConverterChain chain2 = ItemAttributeValueConverterChain.builder().addConverter(chain).build();
+        AttributeConverterChain chain = AttributeConverterChain.builder().build();
+        AttributeConverterChain chain2 = AttributeConverterChain.builder().addConverter(chain).build();
         assertThat(chain == chain2).isTrue();
     }
 

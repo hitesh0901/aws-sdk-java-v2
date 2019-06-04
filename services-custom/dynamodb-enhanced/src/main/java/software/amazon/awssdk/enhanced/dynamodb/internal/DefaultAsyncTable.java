@@ -19,8 +19,8 @@ import java.util.concurrent.CompletableFuture;
 import software.amazon.awssdk.annotations.SdkInternalApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.enhanced.dynamodb.AsyncTable;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ItemAttributeValueConverter;
-import software.amazon.awssdk.enhanced.dynamodb.internal.converter.ItemAttributeValueConverterChain;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.AttributeConverter;
+import software.amazon.awssdk.enhanced.dynamodb.internal.converter.AttributeConverterChain;
 import software.amazon.awssdk.enhanced.dynamodb.model.ConverterAware;
 import software.amazon.awssdk.enhanced.dynamodb.model.GeneratedRequestItem;
 import software.amazon.awssdk.enhanced.dynamodb.model.GeneratedResponseItem;
@@ -38,7 +38,7 @@ import software.amazon.awssdk.utils.builder.Buildable;
 public class DefaultAsyncTable implements AsyncTable {
     private final DynamoDbAsyncClient client;
     private final String tableName;
-    private final ItemAttributeValueConverter converter;
+    private final AttributeConverter converter;
 
     private DefaultAsyncTable(Builder builder) {
         this.client = builder.client;
@@ -58,7 +58,7 @@ public class DefaultAsyncTable implements AsyncTable {
     @Override
     public CompletableFuture<ResponseItem> getItem(RequestItem key) {
         try {
-            ItemAttributeValueConverter itemConverterChain = getConverter(key);
+            AttributeConverter itemConverterChain = getConverter(key);
             key = key.toBuilder()
                      .clearConverters()
                      .addConverter(itemConverterChain)
@@ -99,17 +99,17 @@ public class DefaultAsyncTable implements AsyncTable {
         }
     }
 
-    private ItemAttributeValueConverter getConverter(ConverterAware item) {
-        return ItemAttributeValueConverterChain.builder()
-                                               .parent(converter)
-                                               .addConverters(item.converters())
-                                               .build();
+    private AttributeConverter getConverter(ConverterAware item) {
+        return AttributeConverterChain.builder()
+                                      .parent(converter)
+                                      .addConverters(item.converters())
+                                      .build();
     }
 
     public static class Builder implements Buildable {
         private String tableName;
         private DynamoDbAsyncClient client;
-        private ItemAttributeValueConverter converter;
+        private AttributeConverter converter;
 
         public Builder name(String tableName) {
             this.tableName = tableName;
@@ -121,7 +121,7 @@ public class DefaultAsyncTable implements AsyncTable {
             return this;
         }
 
-        public Builder converter(ItemAttributeValueConverter converter) {
+        public Builder converter(AttributeConverter converter) {
             this.converter = converter;
             return this;
         }

@@ -29,9 +29,10 @@ import org.junit.Test;
 import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.InstantAttributeConverter;
 import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.StaticListAttributeConverter;
 import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.StaticMapAttributeConverter;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.StringAttributeAttributeConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.StringAttributeConverter;
 import software.amazon.awssdk.enhanced.dynamodb.converter.item.bundled.bean.BeanItemSchema;
 import software.amazon.awssdk.enhanced.dynamodb.converter.item.bundled.bean.StaticBeanItemAttributeConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.string.StringStringConverter;
 import software.amazon.awssdk.enhanced.dynamodb.model.RequestItem;
 import software.amazon.awssdk.enhanced.dynamodb.model.ResponseItem;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
@@ -134,25 +135,26 @@ BeanItemSchema<?> bookSchema =
                               a.attributeName("isbn")
                                .setter(Book::setIsbn)
                                .getter(Book::getIsbn)
-                               .converter(StringAttributeAttributeConverter.create()))
+                               .converter(StringAttributeConverter.create()))
 
                       .addAttributeSchema(String.class, a ->
                               a.attributeName("title")
                                .setter(Book::setTitle)
                                .getter(Book::getTitle)
-                               .converter(StringAttributeAttributeConverter.create()))
+                               .converter(StringAttributeConverter.create()))
 
                       .addAttributeSchema(TypeToken.listOf(String.class), a ->
                               a.attributeName("authors")
                                .setter(Book::setAuthors)
                                .getter(Book::getAuthors)
-                               .converter(StaticListAttributeConverter.create(StringAttributeAttributeConverter.create())))
+                               .converter(StaticListAttributeConverter.create(StringAttributeConverter.create())))
 
                       .addAttributeSchema(TypeToken.mapOf(String.class, Instant.class), a ->
                               a.attributeName("authors")
                                .setter(Book::setPublicationDates)
                                .getter(Book::getPublicationDates)
-                               .converter(StaticMapAttributeConverter.create(null, InstantAttributeConverter.create())))
+                               .converter(StaticMapAttributeConverter.create(StringStringConverter.create(),
+                                                                             InstantAttributeConverter.create())))
 
                       .build();
 

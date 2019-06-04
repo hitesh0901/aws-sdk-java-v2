@@ -16,12 +16,18 @@
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
 import java.time.MonthDay;
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 
 public class MonthDayStringConverter implements StringConverter<MonthDay> {
     private MonthDayStringConverter() { }
 
     public static MonthDayStringConverter create() {
         return new MonthDayStringConverter();
+    }
+
+    @Override
+    public TypeToken<MonthDay> type() {
+        return TypeToken.from(MonthDay.class);
     }
 
     @Override

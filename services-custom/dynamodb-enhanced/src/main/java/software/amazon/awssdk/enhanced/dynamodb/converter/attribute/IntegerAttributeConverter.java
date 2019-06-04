@@ -19,6 +19,7 @@ import java.time.Instant;
 import software.amazon.awssdk.annotations.Immutable;
 import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
+import software.amazon.awssdk.enhanced.dynamodb.converter.string.IntegerStringConverter;
 import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeConvertingVisitor;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
@@ -29,22 +30,25 @@ import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 @SdkPublicApi
 @ThreadSafe
 @Immutable
-public final class IntegerAttributeConverter extends ExactInstanceOfAttributeConverter<Integer> {
-    private IntegerAttributeConverter() {
-        super(Integer.class);
-    }
+public final class IntegerAttributeConverter implements AttributeConverter<Integer> {
+    public static final IntegerStringConverter INTEGER_STRING_CONVERTER = IntegerStringConverter.create();
 
     public static IntegerAttributeConverter create() {
         return new IntegerAttributeConverter();
     }
 
     @Override
-    protected ItemAttributeValue convertToAttributeValue(Integer input, ConversionContext context) {
-        return ItemAttributeValue.fromNumber(input.toString());
+    public TypeToken<Integer> type() {
+        return Integer.class;
     }
 
     @Override
-    protected Integer convertFromAttributeValue(ItemAttributeValue input, TypeToken<?> desiredType, ConversionContext context) {
+    public ItemAttributeValue toAttributeValue(Integer input, ConversionContext context) {
+        return ItemAttributeValue.fromNumber(INTEGER_STRING_CONVERTER.toString(input));
+    }
+
+    @Override
+    public Integer fromAttributeValue(ItemAttributeValue input, ConversionContext context) {
         return input.convert(Visitor.INSTANCE);
     }
 
@@ -57,12 +61,12 @@ public final class IntegerAttributeConverter extends ExactInstanceOfAttributeCon
 
         @Override
         public Integer convertString(String value) {
-            return Integer.parseInt(value);
+            return INTEGER_STRING_CONVERTER.fromString(value);
         }
 
         @Override
         public Integer convertNumber(String value) {
-            return Integer.parseInt(value);
+            return INTEGER_STRING_CONVERTER.fromString(value);
         }
     }
 }

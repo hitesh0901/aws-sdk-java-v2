@@ -16,12 +16,18 @@
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
 import java.math.BigInteger;
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 
 public class BigIntegerStringConverter implements StringConverter<BigInteger> {
     private BigIntegerStringConverter() { }
 
     public static BigIntegerStringConverter create() {
         return new BigIntegerStringConverter();
+    }
+
+    @Override
+    public TypeToken<BigInteger> type() {
+        return TypeToken.from(BigInteger.class);
     }
 
     @Override

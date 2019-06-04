@@ -27,6 +27,9 @@ import software.amazon.awssdk.annotations.Immutable;
 import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.core.SdkBytes;
+import software.amazon.awssdk.enhanced.dynamodb.converter.string.BooleanStringConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.string.ByteArrayStringConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.string.StringStringConverter;
 import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeConvertingVisitor;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
@@ -38,22 +41,23 @@ import software.amazon.awssdk.utils.BinaryUtils;
 @SdkPublicApi
 @ThreadSafe
 @Immutable
-public final class StringAttributeAttributeConverter extends ExactInstanceOfAttributeConverter<String> {
-    private StringAttributeAttributeConverter() {
-        super(String.class);
-    }
-
-    public static StringAttributeAttributeConverter create() {
-        return new StringAttributeAttributeConverter();
+public final class StringAttributeConverter implements AttributeConverter<String> {
+    public static StringAttributeConverter create() {
+        return new StringAttributeConverter();
     }
 
     @Override
-    protected ItemAttributeValue convertToAttributeValue(String input, ConversionContext context) {
+    public TypeToken<String> type() {
+        return TypeToken.from(String.class);
+    }
+
+    @Override
+    public ItemAttributeValue toAttributeValue(String input, ConversionContext context) {
         return ItemAttributeValue.fromString(input);
     }
 
     @Override
-    protected String convertFromAttributeValue(ItemAttributeValue input, TypeToken<?> desiredType, ConversionContext context) {
+    public String fromAttributeValue(ItemAttributeValue input, ConversionContext context) {
         return input.convert(Visitor.INSTANCE);
     }
 
@@ -61,7 +65,7 @@ public final class StringAttributeAttributeConverter extends ExactInstanceOfAttr
         private static final Visitor INSTANCE = new Visitor();
 
         private Visitor() {
-            super(String.class, StringAttributeAttributeConverter.class);
+            super(String.class, StringAttributeConverter.class);
         }
 
         @Override
@@ -76,12 +80,12 @@ public final class StringAttributeAttributeConverter extends ExactInstanceOfAttr
 
         @Override
         public String convertBytes(SdkBytes value) {
-            return "0x" + BinaryUtils.toHex(value.asByteArray());
+            return ByteArrayStringConverter.create().toString(value.asByteArray());
         }
 
         @Override
         public String convertBoolean(Boolean value) {
-            return value.toString();
+            return BooleanStringConverter.create().toString(value);
         }
 
         @Override

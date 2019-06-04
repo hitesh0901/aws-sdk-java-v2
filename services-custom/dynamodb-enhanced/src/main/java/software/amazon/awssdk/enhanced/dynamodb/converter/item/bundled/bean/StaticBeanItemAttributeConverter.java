@@ -17,10 +17,8 @@ package software.amazon.awssdk.enhanced.dynamodb.converter.item.bundled.bean;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionCondition;
 import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ConversionContext;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ItemAttributeValueConverter;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ExactInstanceOfAttributeConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.AttributeConverter;
 import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeConvertingVisitor;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
@@ -89,7 +87,7 @@ public class StaticBeanItemAttributeConverter<T> extends ExactInstanceOfAttribut
         private <U> void convertAndSet(ItemAttributeValue mappedValue,
                                        T response,
                                        BeanAttributeSchema<T, U> attributeSchema) {
-            ItemAttributeValueConverter converter = attributeSchema.converter();
+            AttributeConverter converter = attributeSchema.converter();
             Object unmappedValue =
                     converter.fromAttributeValue(
                             mappedValue,

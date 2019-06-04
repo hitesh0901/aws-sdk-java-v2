@@ -20,9 +20,9 @@ import software.amazon.awssdk.annotations.SdkInternalApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.enhanced.dynamodb.AsyncTable;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.DefaultConverterChain;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ItemAttributeValueConverter;
-import software.amazon.awssdk.enhanced.dynamodb.internal.converter.ItemAttributeValueConverterChain;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.DefaultAttributeConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.AttributeConverter;
+import software.amazon.awssdk.enhanced.dynamodb.internal.converter.AttributeConverterChain;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.utils.Validate;
 
@@ -34,7 +34,7 @@ import software.amazon.awssdk.utils.Validate;
 public class DefaultDynamoDbEnhancedAsyncClient implements DynamoDbEnhancedAsyncClient {
     private boolean shouldCloseUnderlyingClient;
     private final DynamoDbAsyncClient client;
-    private final ItemAttributeValueConverterChain converter;
+    private final AttributeConverterChain converter;
 
     private DefaultDynamoDbEnhancedAsyncClient(Builder builder) {
         if (builder.client == null) {
@@ -74,9 +74,9 @@ public class DefaultDynamoDbEnhancedAsyncClient implements DynamoDbEnhancedAsync
     }
 
     public static class Builder implements DynamoDbEnhancedAsyncClient.Builder {
-        private ItemAttributeValueConverterChain.Builder converterChain =
-                ItemAttributeValueConverterChain.builder()
-                                                .parent(DefaultConverterChain.create());
+        private AttributeConverterChain.Builder converterChain =
+                AttributeConverterChain.builder()
+                                       .parent(DefaultAttributeConverter.create());
         private DynamoDbAsyncClient client;
 
         private Builder() {}
@@ -88,7 +88,7 @@ public class DefaultDynamoDbEnhancedAsyncClient implements DynamoDbEnhancedAsync
         }
 
         @Override
-        public Builder addConverters(Collection<? extends ItemAttributeValueConverter> converters) {
+        public Builder addConverters(Collection<? extends AttributeConverter> converters) {
             Validate.paramNotNull(converters, "converters");
             Validate.noNullElements(converters, "Converters must not contain null members.");
             converterChain.addConverters(converters);
@@ -96,7 +96,7 @@ public class DefaultDynamoDbEnhancedAsyncClient implements DynamoDbEnhancedAsync
         }
 
         @Override
-        public Builder addConverter(ItemAttributeValueConverter converter) {
+        public Builder addConverter(AttributeConverter converter) {
             Validate.paramNotNull(converter, "converter");
             converterChain.addConverter(converter);
             return this;

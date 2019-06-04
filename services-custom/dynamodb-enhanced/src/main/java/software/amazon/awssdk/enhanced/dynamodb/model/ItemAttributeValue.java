@@ -29,7 +29,7 @@ import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.core.util.SdkAutoConstructList;
 import software.amazon.awssdk.core.util.SdkAutoConstructMap;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ItemAttributeValueConverter;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.AttributeConverter;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.utils.ToString;
 import software.amazon.awssdk.utils.Validate;
@@ -331,7 +331,7 @@ public final class ItemAttributeValue {
 
     /**
      * Apply the provided visitor to this item attribute value, converting it into a specific type. This is useful in
-     * {@link ItemAttributeValueConverter} implementations, without having to write a switch statement on the {@link #type()}.
+     * {@link AttributeConverter} implementations, without having to write a switch statement on the {@link #type()}.
      *
      * <p>
      * Reasons this call may fail with a {@link RuntimeException}:

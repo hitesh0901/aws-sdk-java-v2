@@ -16,12 +16,18 @@
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
 import java.time.ZonedDateTime;
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 
 public class ZonedDateTimeStringConverter implements StringConverter<ZonedDateTime> {
     private ZonedDateTimeStringConverter() { }
 
     public static ZonedDateTimeStringConverter create() {
         return new ZonedDateTimeStringConverter();
+    }
+
+    @Override
+    public TypeToken<ZonedDateTime> type() {
+        return TypeToken.from(ZonedDateTime.class);
     }
 
     @Override

@@ -15,11 +15,18 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
+
 public class FloatStringConverter implements StringConverter<Float> {
     private FloatStringConverter() { }
 
     public static FloatStringConverter create() {
         return new FloatStringConverter();
+    }
+
+    @Override
+    public TypeToken<Float> type() {
+        return TypeToken.from(Float.class);
     }
 
     @Override

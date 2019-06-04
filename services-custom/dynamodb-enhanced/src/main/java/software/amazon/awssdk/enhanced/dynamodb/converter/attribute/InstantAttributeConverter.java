@@ -30,22 +30,23 @@ import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 @SdkPublicApi
 @ThreadSafe
 @Immutable
-public final class InstantAttributeConverter extends ExactInstanceOfAttributeConverter<Instant> {
-    private InstantAttributeConverter() {
-        super(Instant.class);
-    }
-
+public final class InstantAttributeConverter implements AttributeConverter<Instant> {
     public static InstantAttributeConverter create() {
         return new InstantAttributeConverter();
     }
 
     @Override
-    protected ItemAttributeValue convertToAttributeValue(Instant input, ConversionContext context) {
+    public TypeToken<Instant> type() {
+        return Instant.class;
+    }
+
+    @Override
+    public ItemAttributeValue toAttributeValue(Instant input, ConversionContext context) {
         return ItemAttributeValue.fromNumber(Long.toString(input.toEpochMilli()));
     }
 
     @Override
-    protected Instant convertFromAttributeValue(ItemAttributeValue input, TypeToken<?> desiredType, ConversionContext context) {
+    public Instant fromAttributeValue(ItemAttributeValue input, ConversionContext context) {
         return input.convert(Visitor.INSTANCE);
     }
 

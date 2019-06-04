@@ -36,17 +36,20 @@ import software.amazon.awssdk.utils.Validate;
 @SdkPublicApi
 @ThreadSafe
 @Immutable
-public final class DynamicListAttributeConverter extends InstanceOfAttributeConverter<List<?>> {
-    public DynamicListAttributeConverter() {
-        super(List.class);
-    }
+public final class DynamicListAttributeConverter implements SubtypeAttributeConverter<List<?>> {
+    private static final TypeToken<List<?>> TYPE = new TypeToken<List<?>>() {};
 
     public static DynamicListAttributeConverter create() {
         return new DynamicListAttributeConverter();
     }
 
     @Override
-    protected ItemAttributeValue convertToAttributeValue(List<?> input, ConversionContext context) {
+    public TypeToken<List<?>> type() {
+        return TYPE;
+    }
+
+    @Override
+    public ItemAttributeValue toAttributeValue(List<?> input, ConversionContext context) {
         List<ItemAttributeValue> attributeValues = new ArrayList<>();
         for (Object object : input) {
             attributeValues.add(context.converter().toAttributeValue(object, context));
@@ -55,52 +58,60 @@ public final class DynamicListAttributeConverter extends InstanceOfAttributeConv
     }
 
     @Override
-    protected List<?> convertFromAttributeValue(ItemAttributeValue input, TypeToken<?> desiredType, ConversionContext context) {
-        Class<?> listType = desiredType.rawClass();
-        List<TypeToken<?>> listTypeParameters = desiredType.rawClassParameters();
+    public <T extends List<?>> T fromAttributeValue(ItemAttributeValue input,
+                                                    TypeToken<T> listType,
+                                                    ConversionContext context) {
+        List<TypeToken<?>> listTypeParameters = listType.rawClassParameters();
 
         Validate.isTrue(listTypeParameters.size() == 1,
-                        "The desired List type appears to be parameterized with more than 1 type: %s", desiredType);
+                        "The desired List type appears to be parameterized with more than 1 type: %s", listType);
+
         TypeToken<?> parameterType = listTypeParameters.get(0);
 
-        return input.convert(new TypeConvertingVisitor<List<?>>(List.class, DynamicListAttributeConverter.class) {
+        return input.convert(new TypeConvertingVisitor<T>(List.class, DynamicListAttributeConverter.class) {
             @Override
-            public List<?> convertSetOfStrings(List<String> value) {
+            public T convertSetOfStrings(List<String> value) {
                 return convertCollection(value, ItemAttributeValue::fromString);
             }
 
             @Override
-            public List<?> convertSetOfNumbers(List<String> value) {
+            public T convertSetOfNumbers(List<String> value) {
                 return convertCollection(value, ItemAttributeValue::fromNumber);
             }
 
             @Override
-            public List<?> convertSetOfBytes(List<SdkBytes> value) {
+            public T convertSetOfBytes(List<SdkBytes> value) {
                 return convertCollection(value, ItemAttributeValue::fromBytes);
             }
 
             @Override
-            public List<?> convertListOfAttributeValues(Collection<ItemAttributeValue> value) {
+            public T convertListOfAttributeValues(Collection<ItemAttributeValue> value) {
                 return convertCollection(value, Function.identity());
             }
 
-            private <T> List<?> convertCollection(Collection<T> collection,
-                                                  Function<T, ItemAttributeValue> toAttributeValueFunction) {
-                return collection.stream()
-                                 .map(toAttributeValueFunction)
-                                 .map(v -> context.converter().fromAttributeValue(v, parameterType, context))
-                                 .collect(Collectors.toCollection(() -> createList(listType)));
+            private <U> T convertCollection(Collection<U> collection,
+                                            Function<U, ItemAttributeValue> toAttributeValueFunction) {
+                List<Object> result = collection.stream()
+                                                .map(toAttributeValueFunction)
+                                                .map(v -> context.converter().fromAttributeValue(v, parameterType, context))
+                                                .collect(Collectors.toCollection(() -> createList(listType.rawClass())));
+                // This is a safe cast - We know the values we added to the list match the type that the customer requested.
+                return (T) result;
             }
         });
     }
 
-    private List<Object> createList(Class<?> listType) {
-        if (listType.isInterface()) {
+    private List<Object> createList(Class<? extends List<?>> listType) {
+        if (listType.isInterface())
+        {
             Validate.isTrue(listType.equals(List.class), "Requested interface type %s is not supported.", listType);
+            // The customer just wants a List.class, so we can safely use an ArrayList.
             return new ArrayList<>();
         }
 
         try {
+            // We need to treat it as a generic list of objects while we populate it. This is safe, because we'll only populate
+            // it with the types requested by the customer.
             return (List<Object>) listType.getConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new IllegalStateException("Failed to instantiate the requested type " + listType.getTypeName() + ".", e);

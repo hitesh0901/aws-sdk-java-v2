@@ -16,12 +16,18 @@
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
 import java.time.Instant;
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 
 public class InstantStringConverter implements StringConverter<Instant> {
     private InstantStringConverter() { }
 
     public static InstantStringConverter create() {
         return new InstantStringConverter();
+    }
+
+    @Override
+    public TypeToken<Instant> type() {
+        return TypeToken.from(Instant.class);
     }
 
     @Override

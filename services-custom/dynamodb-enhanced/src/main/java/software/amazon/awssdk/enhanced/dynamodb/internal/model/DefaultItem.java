@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.Map;
 import software.amazon.awssdk.annotations.SdkInternalApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ItemAttributeValueConverter;
-import software.amazon.awssdk.enhanced.dynamodb.internal.converter.ItemAttributeValueConverterChain;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.AttributeConverter;
+import software.amazon.awssdk.enhanced.dynamodb.internal.converter.AttributeConverterChain;
 import software.amazon.awssdk.enhanced.dynamodb.model.AttributeAware;
 import software.amazon.awssdk.enhanced.dynamodb.model.ConverterAware;
 import software.amazon.awssdk.utils.Validate;
@@ -37,14 +37,14 @@ import software.amazon.awssdk.utils.Validate;
 @ThreadSafe
 public abstract class DefaultItem<AttributeT> implements ConverterAware,
                                                          AttributeAware<AttributeT> {
-    protected final ItemAttributeValueConverterChain converterChain;
+    protected final AttributeConverterChain converterChain;
     private final Map<String, AttributeT> attributes;
-    private final List<ItemAttributeValueConverter> converters;
+    private final List<AttributeConverter> converters;
 
     protected DefaultItem(Builder<AttributeT, ?> builder) {
         this.converters = Collections.unmodifiableList(new ArrayList<>(builder.converters));
         this.attributes = Collections.unmodifiableMap(new LinkedHashMap<>(builder.attributes));
-        this.converterChain = ItemAttributeValueConverterChain.create(converters());
+        this.converterChain = AttributeConverterChain.create(converters());
     }
 
     @Override
@@ -59,7 +59,7 @@ public abstract class DefaultItem<AttributeT> implements ConverterAware,
     }
 
     @Override
-    public List<ItemAttributeValueConverter> converters() {
+    public List<AttributeConverter> converters() {
         return converters;
     }
 
@@ -88,7 +88,7 @@ public abstract class DefaultItem<AttributeT> implements ConverterAware,
             implements ConverterAware.Builder,
                        AttributeAware.Builder<AttributeT> {
         private Map<String, AttributeT> attributes = new LinkedHashMap<>();
-        private List<ItemAttributeValueConverter> converters = new ArrayList<>();
+        private List<AttributeConverter> converters = new ArrayList<>();
 
         protected Builder() {}
 
@@ -126,7 +126,7 @@ public abstract class DefaultItem<AttributeT> implements ConverterAware,
         }
 
         @Override
-        public BuilderT addConverters(Collection<? extends ItemAttributeValueConverter> converters) {
+        public BuilderT addConverters(Collection<? extends AttributeConverter> converters) {
             Validate.paramNotNull(converters, "converters");
             Validate.noNullElements(converters, "Converters must not contain null members.");
             this.converters.addAll(converters);
@@ -134,7 +134,7 @@ public abstract class DefaultItem<AttributeT> implements ConverterAware,
         }
 
         @Override
-        public BuilderT addConverter(ItemAttributeValueConverter converter) {
+        public BuilderT addConverter(AttributeConverter converter) {
             Validate.paramNotNull(converter, "converter");
             this.converters.add(converter);
             return (BuilderT) this;

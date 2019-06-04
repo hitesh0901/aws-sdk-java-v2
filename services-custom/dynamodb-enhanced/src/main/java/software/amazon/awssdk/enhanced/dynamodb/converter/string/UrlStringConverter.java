@@ -17,12 +17,18 @@ package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 
 public class UrlStringConverter implements StringConverter<URL> {
     private UrlStringConverter() { }
 
     public static UrlStringConverter create() {
         return new UrlStringConverter();
+    }
+
+    @Override
+    public TypeToken<URL> type() {
+        return TypeToken.from(URL.class);
     }
 
     @Override

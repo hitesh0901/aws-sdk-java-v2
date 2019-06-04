@@ -20,10 +20,8 @@ import software.amazon.awssdk.annotations.SdkInternalApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.enhanced.dynamodb.MappedTable;
 import software.amazon.awssdk.enhanced.dynamodb.Table;
-import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.ItemAttributeValueConverter;
-import software.amazon.awssdk.enhanced.dynamodb.model.GeneratedResponseItem;
+import software.amazon.awssdk.enhanced.dynamodb.converter.attribute.AttributeConverter;
 import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;
-import software.amazon.awssdk.enhanced.dynamodb.model.ResponseItem;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
@@ -39,7 +37,7 @@ import software.amazon.awssdk.utils.builder.Buildable;
 public class DefaultMappedTable implements MappedTable {
     private final DynamoDbClient client;
     private final String tableName;
-    private final ItemAttributeValueConverter converter;
+    private final AttributeConverter converter;
 
     private DefaultMappedTable(Builder builder) {
         this.client = builder.client;
@@ -90,7 +88,7 @@ public class DefaultMappedTable implements MappedTable {
     public static class Builder implements Buildable {
         private String tableName;
         private DynamoDbClient client;
-        private ItemAttributeValueConverter converter;
+        private AttributeConverter converter;
 
         public Builder name(String tableName) {
             this.tableName = tableName;
@@ -102,7 +100,7 @@ public class DefaultMappedTable implements MappedTable {
             return this;
         }
 
-        public Builder converter(ItemAttributeValueConverter converter) {
+        public Builder converter(AttributeConverter converter) {
             this.converter = converter;
             return this;
         }

@@ -20,7 +20,7 @@ import java.util.Map;
 import software.amazon.awssdk.annotations.Immutable;
 import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.annotations.ThreadSafe;
-import software.amazon.awssdk.enhanced.dynamodb.internal.converter.ItemAttributeValueConverterChain;
+import software.amazon.awssdk.enhanced.dynamodb.internal.converter.AttributeConverterChain;
 import software.amazon.awssdk.enhanced.dynamodb.model.ItemAttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.RequestItem;
 import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
@@ -42,10 +42,10 @@ public final class RequestItemAttributeConverter extends InstanceOfAttributeConv
 
     @Override
     protected ItemAttributeValue convertToAttributeValue(RequestItem input, ConversionContext conversionContext) {
-        ItemAttributeValueConverter converter = ItemAttributeValueConverterChain.builder()
-                                                                                .addConverters(input.converters())
-                                                                                .parent(conversionContext.converter())
-                                                                                .build();
+        AttributeConverter converter = AttributeConverterChain.builder()
+                                                              .addConverters(input.converters())
+                                                              .parent(conversionContext.converter())
+                                                              .build();
 
         ConversionContext.Builder conversionContextBuilder = conversionContext.toBuilder()
                                                                               .converter(converter);

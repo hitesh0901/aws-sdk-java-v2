@@ -16,6 +16,7 @@
 package software.amazon.awssdk.enhanced.dynamodb.converter.string;
 
 import java.util.concurrent.atomic.AtomicLong;
+import software.amazon.awssdk.enhanced.dynamodb.model.TypeToken;
 
 public class AtomicLongStringConverter implements StringConverter<AtomicLong> {
     private static LongStringConverter LONG_CONVERTER = LongStringConverter.create();
@@ -24,6 +25,11 @@ public class AtomicLongStringConverter implements StringConverter<AtomicLong> {
 
     public static AtomicLongStringConverter create() {
         return new AtomicLongStringConverter();
+    }
+
+    @Override
+    public TypeToken<AtomicLong> type() {
+        return TypeToken.from(AtomicLong.class);
     }
 
     @Override
