@@ -36,7 +36,7 @@ import java.lang.annotation.Target;
 @Retention(SOURCE)
 @Target({PACKAGE, TYPE, ANNOTATION_TYPE, METHOD, CONSTRUCTOR, FIELD,
          LOCAL_VARIABLE, PARAMETER})
-@SdkProtectedApi
+//@SdkProtectedApi
 public @interface Generated {
     /**
      * The value element MUST have the name of the code generator.
