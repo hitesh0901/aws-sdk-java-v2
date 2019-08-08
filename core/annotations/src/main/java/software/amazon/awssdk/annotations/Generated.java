@@ -31,6 +31,7 @@ import java.lang.annotation.Target;
 
 /**
  * Marker interface for generated source codes. Generated source codes should not be edited directly.
+ * Adding a comment
  */
 @Documented
 @Retention(SOURCE)
